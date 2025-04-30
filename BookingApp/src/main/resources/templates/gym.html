@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .machine {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: gray;
+        }
+        .in-use {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+<h1>ジム設備の利用状況</h1>
+<div>
+    <div th:each="machine : ${machines}" class="machine">
+        <div th:class="'icon ' + (${machine.usagestatus == 1} ? 'in-use' : '')"></div>
+        <!-- managementnumber のみ表示 -->
+        <div th:text="${machine.managementnumber}"></div>
+        <form th:if="${machine.usagestatus == 0}" th:action="@{/gym/start}" method="post">
+            <input type="hidden" name="managementnumber" th:value="${machine.managementnumber}" />
+            <button type="submit">利用開始</button>
+        </form>
+        <form th:if="${machine.usagestatus == 1}" th:action="@{/gym/stop}" method="post">
+            <input type="hidden" name="managementnumber" th:value="${machine.managementnumber}" />
+            <button type="submit">利用終了</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
