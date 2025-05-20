@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.repository.MemberMapper">
+
+  <!-- 会員情報取得(メールアドレス) -->
+  <select id="findByMail" resultType="Member">
+    select
+      id
+      , name
+      , mail
+      , password
+      , phone_number
+      , role
+      , updated_at
+      , created_at
+    from
+      members
+    where
+      mail = #{mail}
+  </select>
+
+  <!-- 会員情報取得(会員ID) -->
+  <select id="findById" resultType="Member">
+    select
+      id
+      , name
+      , mail
+      , password
+      , phone_number
+      , role
+      , updated_at
+      , created_at
+    from
+      members
+    where
+      id = #{memberId}
+  </select>
+
+  <!-- 新規会員登録 -->
+  <insert id="createMember">
+    insert into members (
+      name
+      , mail
+      , password
+      , phone_number
+      , role
+    ) values (
+      #{name}
+      , #{mail}
+      , #{password}
+      , #{phoneNumber}
+      , #{role}
+    )
+  </insert>
+
+  <!-- 会員基本情報更新 -->
+  <update id="updateProfile">
+    update members
+    set
+      name = #{name}
+      , phone_number = #{phoneNumber}
+    where
+      id = #{id}
+  </update>
+
+  <!-- メールアドレス変更 -->
+  <update id="updateMail">
+    update members
+    set
+      mail = #{mail}
+    where
+      id = #{id}
+  </update>
+
+  <!-- パスワード変更 -->
+  <update id="updatePassword">
+    update members
+    set
+      password = #{encodePassword}
+    where
+      id = #{memberId}
+  </update>
+
+</mapper>

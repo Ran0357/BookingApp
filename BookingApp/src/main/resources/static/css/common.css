@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+/* 共通 */
+html {
+  font-size: 100%;
+}
+body {
+  font-family: "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "ヒラギノ角ゴ Pro W3", sans-serif;
+  line-height: 1.7;
+}
+main {
+  padding-top: 60px;
+}
+main > .container {
+  padding-bottom: 20px;
+}
+.page-title {
+  padding-top: 30px;
+  margin-bottom: 2.0rem;
+}
+.form-control-plaintext:disabled {
+  -webkit-text-fill-color: #212529;
+  opacity: 1;
+}
+
+/* サイトタイプ一覧 */
+.siteRatesTable {
+  max-width: auto;
+}
+.siteType-card-body {
+  padding-bottom: 13px;
+}
+
+/* ログイン */
+#login {
+  margin-top: 130px;
+}
+@media (max-width: 575px) {
+  #login {
+    margin-top: 30px;
+  }
+}
+
+/* 予約一覧 */
+@media (max-width: 767px) {
+  .reservation-list {
+    font-size: 0.8rem;
+  }
+  .detail-btn {
+    font-size: 0.8rem;
+    padding: .375rem .5rem;
+    white-space: nowrap;
+  }
+}

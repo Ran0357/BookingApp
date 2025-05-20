@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ユーザー新規追加</title>
+</head>
+<body>
+    <h1>ユーザー新規追加</h1>
+
+    <form th:action="@{/usercreate}" method="post">
+        <label>名前：</label>
+        <input type="text" name="username" required><br/>
+
+        <label>ユーザーID：</label>
+        <input type="text" name="userid" required><br/>
+
+        <label>パスワード：</label>
+        <input type="text" name="password" required><br/>
+
+        <label>ユーザータイプ：</label>
+        <select name="usertype">
+            <option value="1">一般</option>
+            <option value="2">管理者</option>
+        </select><br/>
+
+        <button type="submit">追加</button>
+        <a th:href="@{/home}"><button type="button">戻る</button></a>
+    </form>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xlsx">
+    <button type="submit">アップロード</button>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.repository.ReservationMapper">
+
+	<!-- 予約登録 -->
+	<insert id="createReservation" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into reservations (
+		facility_id,
+		reservation_date,
+		start_time,
+		end_time,
+		number_of_people,
+		member_id
+		) values (
+		#{facilityTypeId},
+		#{reservationDate},
+		#{startTime},
+		#{endTime},
+		#{numberOfPeople},
+		#{memberId}
+		)
+	</insert>
+
+	<!-- 予約情報取得(ページネーション) -->
+	<select id="findPageByMemberId" resultMap="reservations">
+		select
+		r.id,
+		r.facility_id,
+		r.reservation_date,
+		r.start_time,
+		r.end_time,
+		r.number_of_people,
+		r.canceled_at,
+		r.created_at,
+		st.id as facility_type_id,
+		st.name as facility_type_name,
+		st.capacity as facility_type_capacity
+		from
+		reservations r
+		inner join
+		facility_types st on r.facility_id = st.id
+		where
+		r.member_id = #{memberId}
+		order by
+		r.reservation_date desc,
+		r.id desc
+		limit
+		#{pageable.pageSize}
+		offset
+		#{pageable.offset}
+	</select>
+
+	<!-- 予約詳細取得 -->
+	<select id="findReservationDetailsById" resultMap="reservations">
+		select
+		r.id,
+		r.facility_id,
+		r.reservation_date,
+		r.start_time,
+		r.end_time,
+		r.number_of_people,
+		r.member_id,
+		r.created_at,
+		st.id as facility_type_id,
+		st.name as facility_type_name,
+		st.capacity as facility_type_capacity,
+		m.id as member_id,
+		m.name as member_name,
+		m.mail as member_mail,
+		m.phone_number as member_phone_number
+		from
+		reservations r
+		inner join
+		facility_types st on r.facility_id = st.id
+		inner join
+		members m on r.member_id = m.id
+		where
+		r.id = #{reservationId}
+	</select>
+
+	<!-- 予約キャンセル -->
+	<update id="cancelReservation">
+		update reservations
+		set canceled_at = now()
+		where id = #{reservationId}
+	</update>
+
+	<!-- 予約取得(施設タイプID、予約日) -->
+	<select id="findByDateAndFacilityType" parameterType="map"
+		resultType="com.example.demo.domain.model.Reservations">
+		select *
+		from reservations
+		where reservation_date = #{reservationDate}
+		and facility_id = #{facilityTypeId}
+	</select>
+
+	<!-- 予約数取得 -->
+	<select id="countByMemberId" parameterType="int"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM reservations
+		WHERE member_id = #{memberId}
+	</select>
+
+
+	<!-- 結果マッピング -->
+	<resultMap id="reservations"
+		type="com.example.demo.domain.model.Reservations">
+		<id column="id" property="id" />
+		<result column="facility_id" property="facilityTypeId" />
+		<result column="reservation_date" property="reservationDate" />
+		<result column="start_time" property="startTime" />
+		<result column="end_time" property="endTime" />
+		<result column="number_of_people" property="numberOfPeople" />
+		<result column="member_id" property="memberId" />
+		<result column="canceled_at" property="canceledAt" />
+		<result column="created_at" property="createdAt" />
+
+		<association property="facilityType"
+			javaType="com.example.demo.domain.model.FacilityType"
+			columnPrefix="facility_type_">
+			<id column="id" property="id" />
+			<result column="name" property="name" />
+			<result column="capacity" property="capacity" />
+		</association>
+
+		<association property="member"
+			javaType="com.example.demo.domain.model.Member"
+			columnPrefix="member_">
+			<id column="id" property="id" />
+			<result column="name" property="name" />
+			<result column="mail" property="mail" />
+			<result column="phone_number" property="phoneNumber" />
+		</association>
+	</resultMap>
+
+</mapper>

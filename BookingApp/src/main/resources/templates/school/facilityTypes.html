@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <title>施設タイプ一覧</title>
+</head>
+
+<body>
+  <main layout:fragment="content">
+    <div class="container">
+      <h3 class="page-title">施設タイプ一覧</h3>
+      <div class="row" th:each="facilityType : ${facilityTypeList}">
+        <div class="col-lg-8 mt-3 offset-lg-2">
+          <div class="card shadow-sm" style="max-width: 800px;">
+            <div class="card-body siteType-card-body">
+              <h5 class="card-title" th:text="${facilityType.name}"></h5>
+              <p class="card-text">
+                <small th:text="|ご利用人数： ${facilityType.capacity}名まで|"></small>
+              </p>
+              <a th:href="@{/school/schedule(facilityTypeId=${facilityType.id})}" class="btn btn-primary btn-block" role="button" style="max-width: 400px;">
+                選択
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>
