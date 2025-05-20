@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ユーザープロフィール</title>
+</head>
+<body>
+    <h1>ユーザープロフィール</h1>
+
+    <form th:action="@{/userprofile/update}" method="post">
+        <div th:each="user : ${machines}">
+            <input type="hidden" th:name="id" th:value="${user.id}" />
+
+            <label>名前：</label>
+            <input type="text" th:name="username" th:value="${user.username}" 
+                   th:disabled="${user.usertype != 1}" /><br/>
+
+            <label>ユーザーID：</label>
+            <input type="text" th:name="userid" th:value="${user.userid}" disabled /><br/>
+
+            <label>パスワード：</label>
+            <input type="text" th:name="password" th:value="${user.password}" /><br/>
+
+            <button type="submit">変更</button>
+            <a th:href="@{/home}"><button type="button">戻る</button></a>
+        </div>
+    </form>
+
+    <div class="logout">
+        <button>ログアウト</button>
+    </div>
+</body>
+</html>
