@@ -1,0 +1,126 @@
+-- 最大実行時間を300秒に設定（長い再帰CTEのため）
+SET SESSION max_execution_time=300000;
+
+-- rolesテーブル
+CREATE TABLE IF NOT EXISTS roles (
+    `key` VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO roles (`key`, name, created_at) VALUES 
+('ROLE_ADMIN', '管理者', CURRENT_TIMESTAMP),
+('ROLE_GENERAL', '一般ユーザ', CURRENT_TIMESTAMP);
+
+-- membersテーブル
+CREATE TABLE IF NOT EXISTS members (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    mail VARCHAR(255) UNIQUE,
+    password TEXT NOT NULL,
+    phone_number VARCHAR(15),
+    role VARCHAR(255),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_members_role FOREIGN KEY (role) REFERENCES roles(`key`)
+);
+
+-- facility_typesテーブル
+CREATE TABLE IF NOT EXISTS facility_types (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    capacity INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO facility_types (id, name, capacity, created_at) VALUES
+(1, 'カラオケ', 20, CURRENT_TIMESTAMP),
+(2, 'ジム', 8, CURRENT_TIMESTAMP),
+(3, 'ブース', 1, CURRENT_TIMESTAMP);
+
+-- calendarテーブル
+CREATE TABLE IF NOT EXISTS calendar (
+    calendar_date DATE PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+SET SESSION cte_max_recursion_depth = 5000;
+
+INSERT INTO calendar (calendar_date, created_at)
+-- calendarデータ投入（再帰CTEで2019-10-01から2030-12-31までの日付を生成）
+WITH RECURSIVE date_series AS (
+    SELECT DATE('2019-10-01') AS calendar_date
+    UNION ALL
+    SELECT DATE_ADD(calendar_date, INTERVAL 1 DAY)
+    FROM date_series
+    WHERE calendar_date < '2030-12-31'
+)
+SELECT calendar_date, CURRENT_TIMESTAMP FROM date_series;
+
+-- facility_availabilityテーブル
+CREATE TABLE IF NOT EXISTS facility_availability (
+    calendar_date DATE,
+    facility_type_id INT,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    availability_count SMALLINT NOT NULL,
+    max_count SMALLINT NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (calendar_date, facility_type_id),
+    CONSTRAINT fk_fac_avail_calendar FOREIGN KEY (calendar_date) REFERENCES calendar(calendar_date),
+    CONSTRAINT fk_fac_avail_type FOREIGN KEY (facility_type_id) REFERENCES facility_types(id)
+);
+INSERT INTO facility_availability (
+    calendar_date, facility_type_id, start_time, end_time,
+    availability_count, max_count, updated_at, created_at
+)
+WITH RECURSIVE date_series AS (
+    SELECT DATE('2019-10-01') AS calendar_date
+    UNION ALL
+    SELECT DATE_ADD(calendar_date, INTERVAL 1 DAY)
+    FROM date_series
+    WHERE calendar_date < '2030-12-31'
+)
+SELECT calendar_date, 1, '15:00:00', '17:30:00', 20, 20, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM date_series
+UNION ALL
+SELECT calendar_date, 2, '09:00:00', '17:30:00', 8, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM date_series
+UNION ALL
+SELECT calendar_date, 3, '08:00:00', '17:30:00', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM date_series;
+-- facilitiesテーブル
+CREATE TABLE IF NOT EXISTS facilities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    facility_type_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_facilities_type FOREIGN KEY (facility_type_id) REFERENCES facility_types(id)
+);
+
+INSERT INTO facilities (facility_type_id, name, description) VALUES
+(1, 'カラオケ', 'カラオケルーム'),
+(2, 'ジム1', 'エアロバイク1'),
+(2, 'ジム2', 'エアロバイク2'),
+(2, 'ジム3', 'エアロバイク3'),
+(2, 'ジム4', 'ランニングマシン1'),
+(2, 'ジム5', 'ランニングマシン2'),
+(2, 'ジム6', 'ランニングマシン3'),
+(2, 'ジム7', 'ランニングマシン4'),
+(2, 'ジム8', 'ランニングマシン5'),
+(3, 'ブース1', '6号館2階'),
+(3, 'ブース2', '6号館3階');
+
+-- reservationsテーブル
+CREATE TABLE IF NOT EXISTS reservations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    facility_id INT NOT NULL,
+    reservation_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    number_of_people INT NOT NULL,
+    member_id INT,
+    canceled_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reservations_facility FOREIGN KEY (facility_id) REFERENCES facilities(id),
+    CONSTRAINT fk_reservations_member FOREIGN KEY (member_id) REFERENCES members(id)
+);

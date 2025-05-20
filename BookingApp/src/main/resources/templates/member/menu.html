@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout}">
+
+<head>
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <title>マイページ</title>
+</head>
+
+<body>
+  <main layout:fragment="content">
+    <div class="container">
+      <h3 class="page-title">マイページ</h3>
+      <p th:text="|こんにちは ${userName} さん|"></p>
+      <h4>メニュー</h4>
+      <div>
+        <div class="list-group">
+          <a th:href="@{/member/profile}" class="list-group-item list-group-item-action">会員基本情報更新 &raquo;</a>
+          <a th:href="@{/member/mail}" class="list-group-item list-group-item-action">メールアドレス変更 &raquo;</a>
+          <a th:href="@{/member/password}" class="list-group-item list-group-item-action">パスワード変更 &raquo;</a>
+          <a th:href="@{/member/reservations/list}" class="list-group-item list-group-item-action">予約内容の確認・キャンセル &raquo;</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>

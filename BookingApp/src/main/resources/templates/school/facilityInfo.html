@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layout/layout}">
+
+<head>
+	<link rel="stylesheet" th:href="@{/css/common.css}">
+	<title>施設利用情報</title>
+</head>
+
+<body>
+	<main layout:fragment="content">
+		<div class="container">
+			<h3 class="page-title">施設利用情報</h3>
+			<div>
+				<form th:action="@{/school/facilityInfo}" method="post" th:object="${facilityUseForm}">
+					<!-- 施設名 -->
+					<div class="form-group row">
+						<label for="facilityName" class="col-md-3 col-form-label">施設名</label>
+						<div class="col-md-9">
+							<input type="text" id="facilityName" class="form-control-plaintext"
+								th:value="${facilityUseForm.facilityName}" disabled>
+						</div>
+					</div>
+
+					<!-- 利用日 -->
+					<div class="form-group row">
+						<label for="useDate" class="col-md-3 col-form-label">利用日</label>
+						<div class="col-md-5">
+							<input type="date" class="form-control" th:field="*{useDate}" th:errorclass="is-invalid"
+								readonly>
+							<div class="invalid-feedback" th:errors="*{useDate}"></div>
+						</div>
+					</div>
+
+					<!-- 利用時間（開始） -->
+					<div class="form-group row" th:if="${facilityUseForm.facilityId == 1}">
+						<label for="startTime" class="col-md-3 col-form-label">開始時間</label>
+						<div class="col-md-5">
+							<input type="time" class="form-control" value="15:00" readonly>
+							<input type="hidden" th:field="*{startTime}" value="15:00" /> <!-- ここで値を設定 -->
+						</div>
+					</div>
+					<div class="form-group row" th:if="${facilityUseForm.facilityId != 1}">
+						<label for="startTime" class="col-md-3 col-form-label">開始時間 <span
+								class="badge bg-warning text-dark">必須</span></label>
+						<div class="col-md-5">
+							<input type="time" class="form-control" th:field="*{startTime}" th:errorclass="is-invalid">
+							<div class="invalid-feedback" th:errors="*{startTime}"></div>
+						</div>
+					</div>
+
+					<!-- 利用時間（終了） -->
+					<div class="form-group row" th:if="${facilityUseForm.facilityId == 1}">
+						<label for="endTime" class="col-md-3 col-form-label">終了時間</label>
+						<div class="col-md-5">
+							<input type="time" class="form-control" value="17:30" readonly>
+							<input type="hidden" th:field="*{endTime}" value="17:30" />
+						</div>
+					</div>
+					<div class="form-group row" th:if="${facilityUseForm.facilityId != 1}">
+						<label for="endTime" class="col-md-3 col-form-label">終了時間 <span
+								class="badge bg-warning text-dark">必須</span></label>
+						<div class="col-md-5">
+							<input type="time" class="form-control" th:field="*{endTime}" th:errorclass="is-invalid">
+							<div class="invalid-feedback" th:errors="*{endTime}"></div>
+						</div>
+					</div>
+
+
+
+					<!-- 利用人数 -->
+					<div class="form-group row">
+						<label for="numberOfPeople" class="col-md-3 col-form-label">利用人数 <span
+								class="badge bg-warning text-dark">必須</span></label>
+						<div class="col-md-5">
+							<select class="form-control" th:field="*{numberOfPeople}" th:errorclass="is-invalid">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+								<option value="13">13</option>
+								<option value="14">14</option>
+								<option value="15">15</option>
+								<option value="16">16</option>
+								<option value="17">17</option>
+								<option value="18">18</option>
+								<option value="19">19</option>
+								<option value="20">20</option>
+								<option value="21">21</option>
+							</select>
+							<div class="invalid-feedback" th:errors="*{numberOfPeople}"></div>
+						</div>
+					</div>
+
+					<!-- ボタン -->
+					<div class="form-group row pt-4">
+						<div class="col-md-5 offset-md-3">
+							<button sec:authorize="isAuthenticated()" class="btn btn-primary btn-block py-2"
+								type="submit" name="member">予約に進む</button>
+							<button sec:authorize="!isAuthenticated()" class="btn btn-primary btn-block py-2"
+								type="submit" name="member">ログインして予約に進む</button>
+							<input type="button" value="戻る" class="btn btn-secondary btn-block py-2"
+								onclick="history.back()">
+						</div>
+					</div>
+
+					<!-- hidden項目 -->
+					<input type="hidden" th:field="*{facilityId}">
+					<input type="hidden" th:field="*{facilityName}">
+				</form>
+			</div>
+		</div>
+	</main>
+</body>
+
+</html>

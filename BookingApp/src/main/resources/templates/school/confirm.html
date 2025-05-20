@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout/layout}">
+
+<head>
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <title>予約内容確認</title>
+</head>
+
+<body>
+  <main layout:fragment="content">
+    <div class="container">
+      <h3 class="page-title">予約内容確認</h3>
+      <div class="row">
+        <div class="col-md-7 px-4">
+          <!-- 予約者情報 -->
+          <section class="mb-5">
+            <h4>予約者情報</h4>
+            <div class="p-2 d-flex border-bottom">
+              <div class="col-5">名前</div>
+              <div class="col-7 text-right" th:text="${userInfoForm.name}"></div>
+            </div>
+            <div class="p-2 d-flex border-bottom pt-3">
+              <div class="col-5">メールアドレス</div>
+              <div class="col-7 text-right" th:text="${userInfoForm.mail}"></div>
+            </div>
+            <div class="p-2 d-flex border-bottom pt-3">
+              <div class="col-5">電話番号</div>
+              <div class="col-7 text-right" th:text="${userInfoForm.phoneNumber}"></div>
+            </div>
+          </section>
+
+          <!-- 利用施設情報 -->
+          <section class="mb-5">
+            <h4>利用施設情報</h4>
+            <div class="p-2 d-flex border-bottom">
+              <div class="col-5">施設名</div>
+              <div class="col-7 text-right" th:text="${facilityUseForm.facilityName}"></div>
+            </div>
+            <div class="p-2 d-flex border-bottom pt-3">
+              <div class="col-5">利用日</div>
+              <div class="col-7 text-right" th:text="${#temporals.format(facilityUseForm.useDate, 'yyyy年M月d日')}"></div>
+            </div>
+            <div class="p-2 d-flex border-bottom pt-3">
+              <div class="col-5">利用時間</div>
+              <div class="col-7 text-right" th:text="|${facilityUseForm.startTime} 〜 ${facilityUseForm.endTime}|"></div>
+            </div>
+            <div class="p-2 d-flex border-bottom pt-3">
+              <div class="col-5">利用人数</div>
+              <div class="col-7 text-right" th:text="|${facilityUseForm.numberOfPeople}人|"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ボタン -->
+        <div class="col-md-5 px-4">
+          <div class="row">
+            <form th:action="@{/school/member/reserve}" class="col-md-12" th:object="${userInfoForm}" method="post">
+              <div class="form-group row pt-2">
+                <button class="btn btn-primary btn-block py-2 mx-md-3" type="submit">予約を確定する</button>
+              </div>
+              <!-- hidden input -->
+              <input type="hidden" name="facilityId" th:value="${facilityUseForm.facilityId}">
+              <input type="hidden" name="facilityName" th:value="${facilityUseForm.facilityName}">
+              <input type="hidden" name="useDate" th:value="${facilityUseForm.useDate}">
+              <input type="hidden" name="startTime" th:value="${facilityUseForm.startTime}">
+              <input type="hidden" name="endTime" th:value="${facilityUseForm.endTime}">
+              <input type="hidden" name="numberOfPeople" th:value="${facilityUseForm.numberOfPeople}">
+              <input type="hidden" th:field="*{name}">
+              <input type="hidden" th:field="*{mail}">
+              <input type="hidden" th:field="*{phoneNumber}">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

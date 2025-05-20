@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout}">
+
+<head>
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <title>会員基本情報更新</title>
+</head>
+
+<body>
+  <main layout:fragment="content">
+    <div class="container">
+      <h3 class="page-title">会員基本情報更新</h3>
+      <form th:action="@{/member/profile}" method="post" th:object="${updateProfileForm}">
+        <!-- 名前 -->
+        <div class="form-group row">
+          <label for="name" class="col-md-3 col-form-label">名前</label>
+          <div class="col-md-6">
+            <input type="text" name="name" id="name" class="form-control" th:field="*{name}" th:errorclass="is-invalid">
+            <div><small>100字以内</small></div>
+            <div class="invalid-feedback" th:errors="*{name}"></div>
+          </div>
+        </div>
+        <!-- 電話番号 -->
+        <div class="form-group row">
+          <label for="phoneNumber" class="col-md-3 col-form-label">電話番号</label>
+          <div class="col-md-6">
+            <input type="text" name="phoneNumber" id="phoneNumber" class="form-control" th:field="*{phoneNumber}" th:errorclass="is-invalid">
+            <div><small>ハイフン"-"を含まない半角数字 例： 09012345678</small></div>
+            <div class="invalid-feedback" th:errors="*{phoneNumber}"></div>
+          </div>
+        </div>
+        <!-- 更新ボタン -->
+        <div class="form-group row pt-4">
+          <div class="col-md-6 offset-md-3">
+            <button class="btn btn-primary btn-block py-2">更新</button>
+            <a th:href="@{/member/menu}" class="btn btn-secondary btn-block">戻る</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+
+</html>
