@@ -4,6 +4,7 @@
 
 <head>
   <link rel="stylesheet" th:href="@{/css/common.css}">
+  <script th:src="@{/js/password.js}"></script>
   <title>会員登録</title>
 </head>
 
@@ -22,14 +23,35 @@
           </div>
         </div>
         <!-- パスワード -->
-        <div class="form-group row">
-          <label for="password" class="col-md-3 col-form-label">パスワード</label>
-          <div class="col-md-6">
-            <input type="password" name="password" id="password" class="form-control" th:field="*{password}" th:errorclass="is-invalid">
-            <div><small>半角英数字8文字以上</small></div>
-            <div class="invalid-feedback" th:errors="*{password}"></div>
-          </div>
-        </div>
+<div class="form-group row">
+  <label for="password" class="col-md-3 col-form-label">パスワード</label>
+  <div class="col-md-6">
+    <div class="input-group">
+      <input type="password" name="password" id="password" class="form-control" th:field="*{password}" th:errorclass="is-invalid">
+      <div class="input-group-append">
+        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password')">表示</button>
+      </div>
+    </div>
+    <div><small>半角英数字8文字以上</small></div>
+    <div class="invalid-feedback" th:errors="*{password}"></div>
+  </div>
+</div>
+
+<!-- パスワード確認 -->
+<div class="form-group row">
+  <label for="confirmPassword" class="col-md-3 col-form-label">パスワード（確認）</label>
+  <div class="col-md-6">
+    <div class="input-group">
+      <input type="password" id="confirmPassword" class="form-control">
+      <div class="input-group-append">
+        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirmPassword')">表示</button>
+      </div>
+    </div>
+    <div id="passwordMismatch" class="text-danger d-none">パスワードが一致しません</div>
+  </div>
+</div>
+
+
         <!-- 名前 -->
         <div class="form-group row">
           <label for="name" class="col-md-3 col-form-label">名前</label>
@@ -50,10 +72,11 @@
         </div>
         <!-- 登録ボタン -->
         <div class="form-group row mt-4">
-          <div class="col-md-6 offset-md-3">
-            <button class="btn btn-primary btn-block py-2" type="submit">登録</button>
-          </div>
-        </div>
+  <div class="col-md-6 offset-md-3">
+    <button class="btn btn-primary btn-block py-2" id="submitBtn" type="submit" disabled>登録</button>
+  </div>
+</div>
+
       </form>
     </div>
   </main>
