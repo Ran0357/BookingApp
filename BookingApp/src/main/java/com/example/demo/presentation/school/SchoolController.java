@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.demo.application.service.GymEquipmentService;
 import com.example.demo.application.service.school.ReserveAppService;
 import com.example.demo.application.service.school.SchoolAppService;
 import com.example.demo.domain.model.FacilityReservationInfo;
+import com.example.demo.domain.model.GymEquipment;
 import com.example.demo.domain.model.Member;
 import com.example.demo.domain.model.Reservations;
 import com.example.demo.domain.model.UserInfo;
@@ -43,6 +45,7 @@ public class SchoolController {
 	
 	private final SchoolAppService schoolAppService;
 	private final ReserveAppService reserveAppService;
+	private final GymEquipmentService gymEquipmentService;  // 追加
 	private final FacilityUseFormValidator facilityUseFormValidator;
 	private final HttpSession session;
 	private final ModelMapper modelMapper;
@@ -77,18 +80,66 @@ public class SchoolController {
 	 */
 	@GetMapping(value = "/schedule", params = "facilityTypeId")
 	public String schedule(@RequestParam("facilityTypeId") int facilityTypeId, Model model) {
-		model.addAttribute("facilityTypeId", facilityTypeId);
-		model.addAttribute("facilityTypeName", schoolAppService.findFacilityTypeName(facilityTypeId));
-		return "school/schedule";
+	    model.addAttribute("facilityTypeId", facilityTypeId);
+	    model.addAttribute("facilityTypeName", schoolAppService.findFacilityTypeName(facilityTypeId));
+
+	    if (facilityTypeId == 2) {
+	        // 利用状況も取得するように修正
+	        model.addAttribute("gymEquipmentList", gymEquipmentService.findCurrentStatus());
+	        return "school/gym";
+	    }
+
+	    return "school/schedule";
+	}
+
+	/**
+	 * ジム機器利用状況表示
+	 */
+	@GetMapping("/gym-status")
+	public String showGymStatus(Model model) {
+		// 利用状況を含むリスト取得
+		var list = gymEquipmentService.findCurrentStatus();
+		model.addAttribute("gymEquipmentList", list);
+		return "school/gym";  // gym-status.html に対応
 	}
 	
+	@GetMapping("/gym/equipment/toggle")
+	public String toggleEquipmentUseStatus(@RequestParam("id") Integer equipmentId, Model model) {
+	    // 該当機器の情報取得
+	    GymEquipment equipment = gymEquipmentService.findById(equipmentId);
+	    if (equipment == null) {
+	        model.addAttribute("message", "該当する機器が見つかりません。");
+	        return "gym/toggleResult";
+	    }
+
+	    // 利用状況を反転して更新
+	    boolean newStatus = !equipment.isInUse();
+	    boolean updated = gymEquipmentService.updateUseStatus(equipmentId, newStatus);
+
+	    if (!updated) {
+	        model.addAttribute("message", "状態の更新に失敗しました。");
+	        return "gym/toggleResult";
+	    }
+
+	    // メッセージセット（使用中になったかどうかで文言変える）
+	    String msg = newStatus ? "使用中になりました。" : "お疲れさまでした。";
+	    model.addAttribute("message", msg);
+	    model.addAttribute("equipmentName", equipment.getEquipmentName());
+
+	    return "school/toggleResult"; // 切り替え結果表示用テンプレート
+	}
+
+	
+	/**
+	 * 施設情報画面
+	 */
 	@GetMapping("/facilityInfo")
 	public String facilityInfo(
 	    @RequestParam("facilityId") int facilityTypeId,
 	    @RequestParam("useDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate useDate,
 	    FacilityUseForm facilityUseForm
 	) {
-	    // 値を明示的にセット
+	    // フォームに値セット
 	    facilityUseForm.setFacilityId(facilityTypeId);
 	    facilityUseForm.setUseDate(useDate);
 
@@ -98,7 +149,6 @@ public class SchoolController {
 	    return "school/facilityInfo";
 	}
 
-	
 	/**
 	 * 施設情報 → 予約内容確認（会員）
 	 */
@@ -175,4 +225,13 @@ public class SchoolController {
 	public String completeByMember() {
 		return "school/complete";
 	}
+	
+	/**
+	 */
+	    @GetMapping("/guide")
+	    public String showFacilityGuidePage() {
+	        return "school/guide"; 
+	    }
+
+	
 }

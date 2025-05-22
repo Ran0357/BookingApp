@@ -4,6 +4,7 @@
 
 <head>
   <link rel="stylesheet" th:href="@{/css/common.css}">
+    <script th:src="@{/js/password.js}"></script>
   <title>ログイン</title>
 </head>
 
@@ -25,9 +26,11 @@
                     <input type="email" name="mail" id="mail" class="form-control" placeholder="メールアドレス" autofocus>
                   </div>
                   <!-- パスワード -->
-                  <div class="mb-3">
-                    <input type="password" name="password" id="password" class="form-control" placeholder="パスワード">
-                  </div>
+				<div class="mb-3 input-group">
+				  <input type="password" name="password" id="password" class="form-control" placeholder="パスワード">
+				  <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password')">表示</button>
+				</div>
+
                   <!-- ログインボタン -->
                   <button class="w-100 btn btn-primary btn-block">ログイン</button>
                 </form>
