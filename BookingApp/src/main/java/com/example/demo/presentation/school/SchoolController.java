@@ -225,4 +225,13 @@ public class SchoolController {
 	public String completeByMember() {
 		return "school/complete";
 	}
+	
+	/**
+	 */
+	    @GetMapping("/guide")
+	    public String showFacilityGuidePage() {
+	        return "school/guide"; 
+	    }
+
+	
 }
