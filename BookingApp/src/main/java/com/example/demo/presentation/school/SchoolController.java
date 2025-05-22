@@ -105,7 +105,7 @@ public class SchoolController {
 	@PostMapping(value = "/facilityInfo", params = "member")
 	public String sendToReserve(@ModelAttribute FacilityUseForm facilityUseForm, BindingResult result) {
 		if (facilityUseForm.getFacilityId() == 1) {
-	        facilityUseForm.setStartTime(LocalTime.of(15, 0));
+	        facilityUseForm.setStartTime(LocalTime.of(15, 30));
 	        facilityUseForm.setEndTime(LocalTime.of(17, 30));
 	    }
 

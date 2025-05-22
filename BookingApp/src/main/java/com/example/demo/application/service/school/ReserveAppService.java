@@ -13,7 +13,6 @@ import com.example.demo.domain.model.Reservations;
 import com.example.demo.domain.model.UserInfo;
 import com.example.demo.domain.service.FacilityAvailabilityService;
 import com.example.demo.domain.service.HolidayService;
-import com.example.demo.domain.service.KaraokeRuleValidator;
 import com.example.demo.domain.service.MemberService;
 import com.example.demo.domain.service.ReservationService;
 import com.example.demo.exception.BusinessException;
@@ -35,6 +34,7 @@ public class ReserveAppService {
     private final MessageSource messageSource;
     private final HolidayService holidayService;  // 学校休館日判定
     private final KaraokeRuleValidator karaokeRuleValidator;  // カラオケ予約ルールのチェック
+    private final BoothRuleValidator boothRuleValidator;  // ブース予約ルールのチェック;
 
     /**
      * 会員情報取得（ID指定）
@@ -64,7 +64,7 @@ public class ReserveAppService {
 
         // カラオケの場合、開始時間と終了時間を自動設定
         if (facilityInfo.getFacilityId() == 1) { // 施設IDがカラオケ施設の場合
-            reservation.setStartTime(LocalTime.of(15, 0)); // 開始時間は15:00
+            reservation.setStartTime(LocalTime.of(15, 30)); // 開始時間は15:30
             reservation.setEndTime(LocalTime.of(17, 30));  // 終了時間は17:30
         } else {
             reservation.setStartTime(facilityInfo.getStartTime());
@@ -91,7 +91,7 @@ public class ReserveAppService {
             }
 
             // 1日1組予約ルール（カラオケの場合）
-            boolean alreadyReserved = reservationService.existsByDateAndSiteType(
+            boolean alreadyReserved = reservationService.existsByDateAndFacilityType(
                     reservation.getReservationDate(), reservation.getFacilityTypeId());
 
             if (alreadyReserved) {
@@ -99,11 +99,22 @@ public class ReserveAppService {
                         messageSource.getMessage("exception.reservation.karaokeAlreadyReserved", null, Locale.JAPAN));
             }
         }
+		//施設ごとに予約ルール判定(ブースの場合)
+		else if (reservation.isBoothReservation()) {
+			// ブースの予約ルールチェック
+			if (!boothRuleValidator.isValid(reservation)) {
+				throw new BusinessException(
+						messageSource.getMessage("exception.reservation.invalidBoothRule",
+								null, Locale.JAPAN));
+			}
+			
+		}
 
-        // 学校休館日チェック（カラオケ予約の場合）
-        if (holidayService.isSchoolHoliday(reservation.getReservationDate())) {
+        // 学校休館日チェック
+        if (holidayService.isFacilityClosed(
+                reservation.getFacilityTypeId(), reservation.getReservationDate())) {
             throw new BusinessException(
-                    messageSource.getMessage("exception.reservation.schoolHoliday", null, Locale.JAPAN));
+                messageSource.getMessage("exception.reservation.facilityHoliday", null, Locale.JAPAN));
         }
 
         // 空き状況の在庫減少チェック

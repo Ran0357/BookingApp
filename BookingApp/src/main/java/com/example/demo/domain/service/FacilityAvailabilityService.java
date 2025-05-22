@@ -44,6 +44,7 @@ public class FacilityAvailabilityService {
      */
     public boolean isAvailableForTimeRange(int facilityTypeId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         List<FacilityAvailability> list = facilityAvailabilityMapper.findFacilityAvailabilityForTimeRange(facilityTypeId, date, startTime, endTime);
+        System.out.println("空き状況ヒット件数: " + list.size());
         return !list.isEmpty();
     }
 

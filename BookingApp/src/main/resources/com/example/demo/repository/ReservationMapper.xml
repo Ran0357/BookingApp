@@ -61,6 +61,7 @@
 		r.end_time,
 		r.number_of_people,
 		r.member_id,
+		r.canceled_at,
 		r.created_at,
 		st.id as facility_type_id,
 		st.name as facility_type_name,

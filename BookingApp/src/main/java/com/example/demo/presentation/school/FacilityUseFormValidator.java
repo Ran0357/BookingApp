@@ -34,10 +34,13 @@ public class FacilityUseFormValidator implements Validator {
 	public void validate(Object target, Errors errors) {
 		FacilityUseForm facilityUseForm = (FacilityUseForm) target;
 		FacilityReservationInfo reservationInfo = modelMapper.map(facilityUseForm, FacilityReservationInfo.class);
+		System.out.println("FacilityUseForm.facilityId: " + facilityUseForm.getFacilityId());
 
-		// 上限人数取得（facilityId か siteTypeId どちらを使うかは設計により選択）
+		System.out.println("facilityId: " + reservationInfo.getFacilityId());
+
+		// 上限人数取得（facilityId）
 		int capacity = facilityTypeService.findByFacilityTypeId(reservationInfo.getFacilityId())
-				.map(site -> site.getCapacity())
+				.map(facility -> facility.getCapacity())
 				.orElseThrow(() -> new SystemException(
 						messageSource.getMessage("exception.dataNotFound",
 								new String[] { String.valueOf(reservationInfo.getFacilityId()) },
@@ -47,7 +50,7 @@ public class FacilityUseFormValidator implements Validator {
 		validateNumberOfPeople(errors, reservationInfo, capacity);
 
 		// 空き状況検証
-		validateSiteAvailability(errors, reservationInfo);
+		validateFacilityAvailability(errors, reservationInfo);
 	}
 
 
@@ -74,7 +77,7 @@ public class FacilityUseFormValidator implements Validator {
 	 * @param facilityUseForm 
 	 * @param facilityUseInfo 施設情報
 	 */
-	private void validateSiteAvailability(Errors errors, FacilityReservationInfo info) {
+	private void validateFacilityAvailability(Errors errors, FacilityReservationInfo info) {
 		FacilityType facilityType = facilityTypeService.findByFacilityTypeId(info.getFacilityId())
 			.orElseThrow(() -> new SystemException("施設情報が見つかりません"));
 
@@ -93,7 +96,7 @@ public class FacilityUseFormValidator implements Validator {
 		}
 
 		if (!available) {
-			errors.rejectValue("useDate", "validation.custom.siteAvailabilityIncorrect");
+			errors.rejectValue("useDate", "validation.custom.facilityAvailabilityIncorrect");
 		}
 	}
 
