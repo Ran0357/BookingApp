@@ -43,6 +43,7 @@ public class UpdateProfileAppService {
 		
 		Member member = findMember(memberId);
 		member.setName(newMember.getName());
+		member.setPhoneNumber(newMember.getPhoneNumber());
 		
 		// 会員基本情報更新
 		memberService.updateProfile(member);

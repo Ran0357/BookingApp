@@ -3,71 +3,107 @@
 dayjs.locale("ja");
 
 document.addEventListener("DOMContentLoaded", function() {
-  // 施設タイプID取得
-  const facilityTypeId = document.getElementById("facilityTypeId").value;
+	// 施設タイプID取得
+	const facilityTypeId = document.getElementById("facilityTypeId").value;
 
-  // eventsのURL生成
-  const eventsUrl = `/api/schedule/facilityTypes/${facilityTypeId}`;
+	// 休館日格納用
+	let closedDates = [];
 
-  // カレンダー表示
-  let calendarEl = document.getElementById("calendar");
-  let calendar = new FullCalendar.Calendar(calendarEl, {
+	// カレンダー表示対象期間
+	const startDate = dayjs().add(1, 'day').format("YYYY-MM-DD");
+	const endDate = dayjs().add(91, 'day').format("YYYY-MM-DD");
 
-    // 日本語
-    locale: "ja",
-    // 全量表示
-    height: "auto",
-    // 月表示
-    initialView: "dayGridMonth",
-    // 1日から開始
-    firstDay: 1,
-    // ヘッダー位置
-    headerToolbar: {
-      left: "today",
-      center: "title",
-      right: "prev,next"
-    },
-    // 日付表記
-    dayCellContent: function (e) {
-      e.dayNumberText = e.dayNumberText.replace("日", "");
-    },
-    // 表示期間
-    validRange: function() {
-      return {
-        start: dayjs().add(1, "day").format("YYYY-MM-DD"),
-        end: dayjs().add(91, "day").format("YYYY-MM-DD")
-      };
-    },
-    events: function fetchFacilityAvailability(info, successCallback, failureCallback) {
-      // 取得開始日
-      let start = dayjs(info.start).format("YYYY-MM-DD");
-      // 取得終了日
-      let end = dayjs(info.end).subtract(1, "day").format("YYYY-MM-DD");
-      // APIから対象期間のデータをfetch
-      let uri = new URL(window.location.href);
-      fetch(`${uri.origin}/api/schedule/facilityTypes/${facilityTypeId}?start=${start}&end=${end}`)
-        .then(response => {
-          if (!response.ok) {
-            console.error("error_response", response);
-            failureCallback();
-          } else {
-            response.json().then(result => {
-              successCallback(result);
-            })
-          }
-        }).catch(error => {
-          console.error(error);
-      })
-    },
-    eventColor: "transparent",
-    eventTextColor: "navy",
-  });
-  calendar.render();
+	// APIのベースURL
+	const uri = new URL(window.location.href);
+
+	// 休館日データ取得 → カレンダー初期化
+	fetch(`${uri.origin}/api/facility/${facilityTypeId}/closed-dates?start=${startDate}&end=${endDate}`)
+		.then(response => {
+			if (!response.ok) throw new Error("休館日取得エラー");
+			return response.json();
+		})
+		.then(data => {
+			closedDates = data; // 例: ["2025-06-01", "2025-06-02"]
+
+			// カレンダー初期化
+			let calendarEl = document.getElementById("calendar");
+			let calendar = new FullCalendar.Calendar(calendarEl, {
+				locale: "ja",
+				height: "auto",
+				initialView: "dayGridMonth",
+				firstDay: 1,
+				headerToolbar: {
+					left: "today",
+					center: "title",
+					right: "prev,next"
+				},
+				dayCellContent: function(e) {
+					e.dayNumberText = e.dayNumberText.replace("日", "");
+				},
+				validRange: {
+					start: startDate,
+					end: endDate
+				},
+				events: function(info, successCallback, failureCallback) {
+					const start = dayjs(info.start).format("YYYY-MM-DD");
+					const end = dayjs(info.end).subtract(1, "day").format("YYYY-MM-DD");
+
+					fetch(`${uri.origin}/api/schedule/facilityTypes/${facilityTypeId}?start=${start}&end=${end}`)
+						.then(response => {
+							if (!response.ok) {
+								console.error("施設空き情報取得エラー", response);
+								failureCallback();
+							} else {
+								response.json().then(result => {
+									// 休館日のイベントは除外
+									const filtered = result.filter(event => {
+										// イベントの日付フィールドが start と仮定
+										const eventDate = dayjs(event.start).format("YYYY-MM-DD");
+										return !closedDates.includes(eventDate);
+									});
+									successCallback(filtered);
+								});
+							}
+						})
+						.catch(error => {
+							console.error(error);
+							failureCallback();
+						});
+				},
+
+				// 休館日を選択不可にする
+				selectAllow: function(info) {
+					const dateStr = dayjs(info.startStr).format("YYYY-MM-DD");
+					return !closedDates.includes(dateStr);
+				},
+				// クリック時に警告表示
+				dateClick: function(info) {
+					const dateStr = dayjs(info.dateStr).format("YYYY-MM-DD");
+					if (closedDates.includes(dateStr)) {
+						alert("この日は休館日のため予約できません。");
+						return;
+					}
+					// TODO: 有効日のクリック処理を書く（必要に応じて）
+				},
+				// 見た目をグレーアウト
+				dayCellClassNames: function(arg) {
+					const dateStr = dayjs(arg.date).format("YYYY-MM-DD");
+					return closedDates.includes(dateStr) ? 'fc-closed-date' : '';
+				},
+				eventColor: "transparent",
+				eventTextColor: "navy",
+			});
+
+			calendar.render();
+		})
+		.catch(error => {
+			console.error("休館日取得に失敗しました:", error);
+		});
 });
 
 /**
  * 施設タイプ一覧に戻る
  */
 function backward() {
-  location.href="/school/facilityTypes";
+	location.href = "/school/facilityTypes";
 }

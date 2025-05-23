@@ -58,8 +58,14 @@ public class ReservationService {
 	public int cancelReservation(int reservationId) {
 		return reservationMapper.cancelReservation(reservationId);
 	}
+	
 
-	public boolean existsByDateAndSiteType(LocalDate reservationDate, Integer facilityTypeId) {
+	/**
+	 * 予約情報取得
+	 * @param reservationId 予約ID
+	 * @return
+	 */
+	public boolean existsByDateAndFacilityType(LocalDate reservationDate, Integer facilityTypeId) {
 		// 予約日とサイトタイプIDで予約が存在するか確認
 		List<Reservations> reservations = reservationMapper.findByDateAndFacilityType(reservationDate, facilityTypeId);
 		// 予約が存在する場合はtrueを返す
@@ -79,4 +85,5 @@ public class ReservationService {
 		return reservationMapper.findReservationDetailsById(reservationId);
 		
 	}
+	
 }

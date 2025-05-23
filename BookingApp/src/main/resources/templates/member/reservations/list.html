@@ -51,11 +51,13 @@
 							<th>施設タイプ</th>
 							<th>予約した時間</th>
 							<th>予約人数</th>
+							<th>状態</th>
 							<th></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="reservation : ${page.getContent()}">
+						<tr th:each="reservation : ${page.getContent()}"
+							th:class="${reservation.isCanceled()} ? 'table-secondary' : ''">
 							<td th:text="${#temporals.format(reservation.reservationDate, 'yyyy-MM-dd')}"></td>
 							<td th:text="${reservation.facilityType != null ? reservation.facilityType.name : '不明'}">
 							</td>
@@ -66,7 +68,10 @@
 									th:text="${reservation.endTime != null ? #temporals.format(reservation.endTime, 'HH:mm') : '-'}"></span>
 							</td>
 							<td th:text="${reservation.numberOfPeople}"></td>
-<!--							<td th:text="${reservation.isCanceled() ? 'キャンセル' : '-' }"></td>-->
+							<td>
+								<span th:if="${reservation.isCanceled()}" class="badge bg-danger">キャンセル済み</span>
+								<span th:unless="${reservation.isCanceled()}">予約済み</span>
+							</td>
 							<td>
 								<a th:href="@{/member/reservations/{reservationId}(reservationId=${reservation.id}, page=${page.number})}"
 									class="btn btn-primary detail-btn">詳細</a>

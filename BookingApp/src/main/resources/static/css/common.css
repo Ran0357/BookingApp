@@ -52,3 +52,16 @@ main > .container {
     white-space: nowrap;
   }
 }
+
+.fc-closed-date {
+  background-color: #f0f0f0 !important;
+  color: #999 !important;
+  pointer-events: none;  /* クリック無効 */
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+
+
+

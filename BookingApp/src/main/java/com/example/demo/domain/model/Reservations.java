@@ -57,6 +57,13 @@ public class Reservations {
 	public boolean isCanceled() {
 		return canceledAt != null;
 	}
+	/**
+     * キャンセル可能かどうかを判定するメソッド
+     * 現時点では、キャンセルされていなければいつでもキャンセル可能
+     */
+    public boolean canCancel() {
+    	 return !isCanceled() && !reservationDate.isBefore(LocalDate.now());
+    }
 
 	/**
 	* ジムの場合、使用機器の状態や空き状況をチェックするためのメソッド
@@ -66,7 +73,7 @@ public class Reservations {
 		return facilityTypeId != null && facilityTypeId == 2; // ジム施設に関連する予約の場合
 	}
 
-	   /**
+	 /**
      * カラオケの予約かどうかを判定するメソッド
      * 例: カラオケのサイトタイプIDが1の場合
      * @return
@@ -74,6 +81,15 @@ public class Reservations {
     public boolean isKaraokeReservation() {
         return facilityTypeId != null && facilityTypeId == 1; // サイトタイプIDが1の時、カラオケ予約と判定
     }
+    
+	/**
+	 * ブースの予約かどうかを判定するメソッド
+	 * 例: ブースのサイトタイプIDが3の場合
+	 * @return 
+	 */
+     public boolean isBoothReservation() {
+    	 return facilityTypeId != null && facilityTypeId == 3; // サイトタイプIDが3の時、ブース予約と判定
+     }
 
 
 

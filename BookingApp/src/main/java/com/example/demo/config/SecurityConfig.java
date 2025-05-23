@@ -39,7 +39,7 @@ public class SecurityConfig {
 					.loginPage("/login")
 					.usernameParameter("mail")
 					.passwordParameter("password")
-					.defaultSuccessUrl("/", false))
+					.defaultSuccessUrl("/", true))
 			.logout(logout -> logout
 					.logoutUrl("/logout")
 					.logoutSuccessUrl("/login?logout")
