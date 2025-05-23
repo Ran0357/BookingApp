@@ -164,6 +164,7 @@ public class SchoolController {
 			return "school/facilityInfo";
 		}
 		session.setAttribute("facilityUseFormSession", facilityUseForm);
+		System.out.println("SessionにfacilityUseFormSessionセット完了: " + facilityUseForm);
 		return "redirect:/school/member/reserve?confirm";
 	}
 	
@@ -173,6 +174,7 @@ public class SchoolController {
 	@GetMapping(value = "/member/reserve", params = "confirm")
 	public String confirmByMember(@AuthenticationPrincipal AuthenticatedMember authenticatedMember, Model model) {
 		FacilityUseForm facilityUseForm = (FacilityUseForm) session.getAttribute("facilityUseFormSession");
+		System.out.println("Sessionから取得したfacilityUseFormSession: " + facilityUseForm);
 		FacilityReservationInfo facilityInfo = modelMapper.map(facilityUseForm, FacilityReservationInfo.class);
 
 		Member member = reserveAppService.findMemberById(authenticatedMember.getId());

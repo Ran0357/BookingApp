@@ -1,84 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.demo.repository.FacilityAvailabilityMapper">
+<mapper
+	namespace="com.example.demo.repository.FacilityAvailabilityMapper">
 
 	<!-- マッピング定義 -->
-	<resultMap id="FacilityAvailabilityResultMap" type="FacilityAvailability">
+	<resultMap id="FacilityAvailabilityResultMap"
+		type="FacilityAvailability">
 		<result property="date" column="calendar_date" />
 		<result property="facilityTypeId" column="facility_type_id" />
-		<result property="availabilityCount" column="availability_count" />
+		<result property="availabilityCount"
+			column="availability_count" />
 		<result property="maxCount" column="max_count" />
 	</resultMap>
 
 	<!-- サイト空き状況検索（日付範囲） -->
-	<select id="findFacilityAvailability" resultMap="FacilityAvailabilityResultMap">
+	<select id="findFacilityAvailability"
+		resultMap="FacilityAvailabilityResultMap">
 		SELECT
-			calendar_date,
-			facility_type_id,
-			availability_count,
-			max_count
+		calendar_date,
+		facility_type_id,
+		availability_count,
+		max_count
 		FROM
-			facility_availability
+		facility_availability
 		WHERE
-			facility_type_id = #{facilityTypeId}
-			AND calendar_date BETWEEN #{from} AND #{to}
+		facility_type_id = #{facilityTypeId}
+		AND calendar_date BETWEEN #{from} AND #{to}
 		ORDER BY
-			calendar_date
+		calendar_date
 	</select>
 
 	<!-- サイト空き状況残数 -->
 	<select id="countDaysNotAvailable" resultType="int">
 		SELECT
-			COUNT(*)
+		COUNT(*)
 		FROM
-			facility_availability
+		facility_availability
 		WHERE
-			facility_type_id = #{facilityTypeId}
-			AND calendar_date BETWEEN #{from} AND #{to}
-			AND availability_count = 0
+		facility_type_id = #{facilityTypeId}
+		AND calendar_date BETWEEN #{from} AND #{to}
+		AND availability_count = 0
 	</select>
 
-	<!-- サイト空き状況減算処理 -->
+	<!-- サイト空き状況減算処理（在庫時間と予約時間が重なっていればOK） -->
 	<update id="reduceAvailabilityCount">
 		UPDATE facility_availability
 		SET availability_count = availability_count - 1
 		WHERE
-			calendar_date = #{date}
-			AND facility_type_id = #{facilityTypeId}
-			AND start_time &gt;= #{startTime}
-			AND end_time &lt;= #{endTime}
+		calendar_date = #{date}
+		AND facility_type_id = #{facilityTypeId}
+		AND NOT (
+		end_time &lt;= #{startTime}
+		OR start_time &gt;= #{endTime}
+		)
 	</update>
 
+
 	<!-- 日単位の空き状況確認 -->
-	<select id="findFacilityAvailabilityOnDate" resultMap="FacilityAvailabilityResultMap">
+	<select id="findFacilityAvailabilityOnDate"
+		resultMap="FacilityAvailabilityResultMap">
 		SELECT
-			calendar_date,
-			facility_type_id,
-			availability_count,
-			max_count
+		calendar_date,
+		facility_type_id,
+		availability_count,
+		max_count
 		FROM
-			facility_availability
+		facility_availability
 		WHERE
-			facility_type_id = #{facilityTypeId}
-			AND calendar_date = #{date}
+		facility_type_id = #{facilityTypeId}
+		AND calendar_date = #{date}
 	</select>
 
 	<!-- 時間帯の空き状況確認 -->
-	<select id="findFacilityAvailabilityForTimeRange" resultMap="FacilityAvailabilityResultMap">
+	<select id="findFacilityAvailabilityForTimeRange"
+		resultMap="FacilityAvailabilityResultMap">
 		SELECT
-			calendar_date,
-			facility_type_id,
-			availability_count,
-			max_count
+		calendar_date,
+		facility_type_id,
+		availability_count,
+		max_count
 		FROM
-			facility_availability
+		facility_availability
 		WHERE
-			facility_type_id = #{facilityTypeId}
-			AND calendar_date = #{date}
-			AND start_time &lt; #{endTime}
-			AND end_time &gt; #{startTime}
-			AND availability_count &gt; 0
+		facility_type_id = #{facilityTypeId}
+		AND calendar_date = #{date}
+		AND start_time &lt; #{endTime}
+		AND end_time &gt; #{startTime}
+		AND availability_count &gt; 0
 	</select>
 
 </mapper>

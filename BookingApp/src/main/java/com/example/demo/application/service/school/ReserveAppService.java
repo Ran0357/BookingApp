@@ -108,6 +108,7 @@ public class ReserveAppService {
 								null, Locale.JAPAN));
 			}
 			
+			
 		}
 
         // 学校休館日チェック
@@ -116,6 +117,7 @@ public class ReserveAppService {
             throw new BusinessException(
                 messageSource.getMessage("exception.reservation.facilityHoliday", null, Locale.JAPAN));
         }
+    
 
         // 空き状況の在庫減少チェック
         int updated = facilityAvailabilityService.reduceAvailabilityCount(

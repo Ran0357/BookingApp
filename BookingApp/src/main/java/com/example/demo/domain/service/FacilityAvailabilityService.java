@@ -54,4 +54,6 @@ public class FacilityAvailabilityService {
     public int reduceAvailabilityCount(int facilityTypeId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return facilityAvailabilityMapper.reduceAvailabilityCount(facilityTypeId, date, startTime, endTime);
     }
+    
+    
 }
