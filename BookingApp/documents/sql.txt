@@ -1,5 +1,6 @@
--- 最大実行時間を300秒に設定（長い再帰CTEのため）
-SET SESSION max_execution_time=300000;
+-- ▼ セッション設定
+SET SESSION max_execution_time = 300000;
+SET SESSION cte_max_recursion_depth = 5000;
 
 -- rolesテーブル
 CREATE TABLE IF NOT EXISTS roles (
@@ -24,8 +25,7 @@ CREATE TABLE IF NOT EXISTS members (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_members_role FOREIGN KEY (role) REFERENCES roles(`key`)
 );
-
--- facility_typesテーブル
+-- ▼ facility_types テーブル
 CREATE TABLE IF NOT EXISTS facility_types (
     id INT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -34,29 +34,29 @@ CREATE TABLE IF NOT EXISTS facility_types (
 );
 
 INSERT INTO facility_types (id, name, capacity, created_at) VALUES
-(1, 'カラオケ', 20, CURRENT_TIMESTAMP),
-(2, 'ジム', 8, CURRENT_TIMESTAMP),
-(3, 'ブース', 1, CURRENT_TIMESTAMP);
+    (1, 'カラオケ', 20, CURRENT_TIMESTAMP),
+    (2, 'ジム', 8, CURRENT_TIMESTAMP),
+    (3, 'ブース', 34, CURRENT_TIMESTAMP);
 
--- calendarテーブル
+-- ▼ calendar テーブル
 CREATE TABLE IF NOT EXISTS calendar (
     calendar_date DATE PRIMARY KEY,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-SET SESSION cte_max_recursion_depth = 5000;
 
 INSERT INTO calendar (calendar_date, created_at)
--- calendarデータ投入（再帰CTEで2019-10-01から2030-12-31までの日付を生成）
-WITH RECURSIVE date_series AS (
-    SELECT DATE('2019-10-01') AS calendar_date
-    UNION ALL
-    SELECT DATE_ADD(calendar_date, INTERVAL 1 DAY)
-    FROM date_series
-    WHERE calendar_date < '2030-12-31'
-)
-SELECT calendar_date, CURRENT_TIMESTAMP FROM date_series;
+SELECT calendar_date, CURRENT_TIMESTAMP FROM (
+    WITH RECURSIVE date_series AS (
+        SELECT DATE('2025-05-01') AS calendar_date
+        UNION ALL
+        SELECT DATE_ADD(calendar_date, INTERVAL 1 DAY)
+        FROM date_series
+        WHERE calendar_date < '2030-12-31'
+    )
+    SELECT calendar_date FROM date_series
+) AS ds;
 
--- facility_availabilityテーブル
+-- ▼ facility_availability テーブル
 CREATE TABLE IF NOT EXISTS facility_availability (
     calendar_date DATE,
     facility_type_id INT,
@@ -66,27 +66,12 @@ CREATE TABLE IF NOT EXISTS facility_availability (
     max_count SMALLINT NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (calendar_date, facility_type_id),
+    PRIMARY KEY (calendar_date, facility_type_id, start_time),
     CONSTRAINT fk_fac_avail_calendar FOREIGN KEY (calendar_date) REFERENCES calendar(calendar_date),
     CONSTRAINT fk_fac_avail_type FOREIGN KEY (facility_type_id) REFERENCES facility_types(id)
 );
-INSERT INTO facility_availability (
-    calendar_date, facility_type_id, start_time, end_time,
-    availability_count, max_count, updated_at, created_at
-)
-WITH RECURSIVE date_series AS (
-    SELECT DATE('2019-10-01') AS calendar_date
-    UNION ALL
-    SELECT DATE_ADD(calendar_date, INTERVAL 1 DAY)
-    FROM date_series
-    WHERE calendar_date < '2030-12-31'
-)
-SELECT calendar_date, 1, '15:30:00', '17:30:00', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM date_series
-UNION ALL
-SELECT calendar_date, 2, '09:00:00', '17:30:00', 8, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM date_series
-UNION ALL
-SELECT calendar_date, 3, '08:00:00', '17:30:00', 100, 100, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM date_series;
--- facilitiesテーブル
+
+-- ▼ facilities テーブル
 CREATE TABLE IF NOT EXISTS facilities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     facility_type_id INT NOT NULL,
@@ -98,19 +83,19 @@ CREATE TABLE IF NOT EXISTS facilities (
 );
 
 INSERT INTO facilities (facility_type_id, name, description) VALUES
-(1, 'カラオケ', 'カラオケルーム'),
-(2, 'ジム1', 'エアロバイク1'),
-(2, 'ジム2', 'エアロバイク2'),
-(2, 'ジム3', 'エアロバイク3'),
-(2, 'ジム4', 'ランニングマシン1'),
-(2, 'ジム5', 'ランニングマシン2'),
-(2, 'ジム6', 'ランニングマシン3'),
-(2, 'ジム7', 'ランニングマシン4'),
-(2, 'ジム8', 'ランニングマシン5'),
-(3, 'ブース1', '6号館2階'),
-(3, 'ブース2', '6号館3階');
+    (1, 'カラオケ', 'カラオケルーム'),
+    (2, 'ジム1', 'エアロバイク1'),
+    (2, 'ジム2', 'エアロバイク2'),
+    (2, 'ジム3', 'エアロバイク3'),
+    (2, 'ジム4', 'ランニングマシン1'),
+    (2, 'ジム5', 'ランニングマシン2'),
+    (2, 'ジム6', 'ランニングマシン3'),
+    (2, 'ジム7', 'ランニングマシン4'),
+    (2, 'ジム8', 'ランニングマシン5'),
+    (3, 'ブース1', '6号館2階'),
+    (3, 'ブース2', '6号館3階');
 
--- reservationsテーブル
+-- ▼ reservations テーブル
 CREATE TABLE IF NOT EXISTS reservations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     facility_id INT NOT NULL,
@@ -124,3 +109,78 @@ CREATE TABLE IF NOT EXISTS reservations (
     CONSTRAINT fk_reservations_facility FOREIGN KEY (facility_id) REFERENCES facilities(id),
     CONSTRAINT fk_reservations_member FOREIGN KEY (member_id) REFERENCES members(id)
 );
+
+INSERT INTO facility_availability (
+    calendar_date, facility_type_id, start_time, end_time,
+    availability_count, max_count, updated_at, created_at
+)
+-- ▼ facility_availability データ投入（例：2025年分）
+WITH RECURSIVE
+date_series AS (
+    SELECT DATE('2025-05-01') AS calendar_date
+    UNION ALL
+    SELECT DATE_ADD(calendar_date, INTERVAL 1 DAY)
+    FROM date_series
+    WHERE calendar_date < '2030-12-31'
+),
+minute_series AS (
+    SELECT 0 AS minutes
+    UNION ALL
+    SELECT minutes + 15
+    FROM minute_series
+    WHERE minutes + 15 < 1440
+),
+facility_config AS (
+    SELECT id AS facility_type_id,
+       CASE id
+           WHEN 1 THEN '15:30:00'  -- カラオケは15:30から開始
+           ELSE '09:00:00'         -- それ以外は9:00開始
+       END AS open_time,
+       '17:30:00' AS close_time,  -- 全施設共通で17:30終了
+       
+       CASE id
+           WHEN 1 THEN 1    -- カラオケは1枠に1組まで予約可能
+           WHEN 2 THEN 8    -- ジムは1枠に8人まで予約可能
+           WHEN 3 THEN 1    -- ブースは1枠に1人まで予約可能
+           ELSE 1           -- その他は1人まで（デフォルト）
+       END AS availability_count
+FROM facility_types
+WHERE id != 2  -- ジムは分割しない（カラオケとブースのみ分割）
+
+),
+time_slots AS (
+    SELECT 
+        f.facility_type_id,
+        CASE 
+            WHEN f.facility_type_id = 1 THEN '15:30:00'
+            ELSE SEC_TO_TIME(TIME_TO_SEC(f.open_time) + m.minutes * 60)
+        END AS start_time,
+        CASE 
+            WHEN f.facility_type_id = 1 THEN '17:30:00'
+            ELSE SEC_TO_TIME(TIME_TO_SEC(f.open_time) + (m.minutes + 15) * 60)
+        END AS end_time,
+        f.availability_count,
+        f.availability_count AS max_count,
+        CURRENT_TIMESTAMP AS updated_at,
+        CURRENT_TIMESTAMP AS created_at,
+        f.open_time,
+        f.close_time
+    FROM facility_config f
+    LEFT JOIN minute_series m 
+        ON f.facility_type_id != 1  -- カラオケは分割しない
+        AND TIME_TO_SEC(f.open_time) + (m.minutes + 15) * 60 <= TIME_TO_SEC(f.close_time)
+)
+
+SELECT
+    d.calendar_date,
+    t.facility_type_id,
+    t.start_time,
+    t.end_time,
+    t.availability_count,
+    t.max_count,
+    t.updated_at,
+    t.created_at
+FROM date_series d
+JOIN time_slots t ON 1=1;
+
+

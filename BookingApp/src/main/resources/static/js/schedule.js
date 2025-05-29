@@ -61,7 +61,20 @@ document.addEventListener("DOMContentLoaded", function() {
 										const eventDate = dayjs(event.start).format("YYYY-MM-DD");
 										return !closedDates.includes(eventDate);
 									});
-									successCallback(filtered);
+									// ここから追加コード
+									const groupedEvents = {};
+									filtered.forEach(event => {
+										const day = dayjs(event.start).format("YYYY-MM-DD");
+										if (!groupedEvents[day]) {
+											groupedEvents[day] = {
+												title: event.title,
+												start: day,
+												allDay: true,
+												url: event.url
+											};
+										}
+									});
+									successCallback(Object.values(groupedEvents));
 								});
 							}
 						})

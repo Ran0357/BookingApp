@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class ReservationService {
 	
 	private final ReservationMapper reservationMapper;
+	private final FacilityAvailabilityService facilityAvailabilityService;
+
 
 	/**
 	 * 予約登録
@@ -56,7 +58,21 @@ public class ReservationService {
 	 * @return
 	 */
 	public int cancelReservation(int reservationId) {
-		return reservationMapper.cancelReservation(reservationId);
+		  // 予約詳細取得（キャンセル済みでないもの）
+        Reservations reservation = reservationMapper.findReservationDetailsById(reservationId)
+            .orElseThrow(() -> new IllegalArgumentException("予約が存在しないかキャンセル済みです"));
+
+        // 予約キャンセル（canceled_atをセット）
+        int result= reservationMapper.cancelReservation(reservationId);
+
+        // 空き状況の空き数を+1（キャンセルによる空き戻し）
+        facilityAvailabilityService.restoreAvailabilityCount(
+            reservation.getFacilityTypeId(),
+            reservation.getReservationDate(),
+            reservation.getStartTime(),
+            reservation.getEndTime()
+        );
+        return result;
 	}
 	
 

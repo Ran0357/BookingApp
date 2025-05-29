@@ -25,7 +25,8 @@
 		FROM
 		facility_availability
 		WHERE
-		facility_type_id = #{facilityTypeId}
+		facility_type_id =
+		#{facilityTypeId}
 		AND calendar_date BETWEEN #{from} AND #{to}
 		ORDER BY
 		calendar_date
@@ -39,20 +40,24 @@
 		facility_availability
 		WHERE
 		facility_type_id = #{facilityTypeId}
-		AND calendar_date BETWEEN #{from} AND #{to}
+		AND
+		calendar_date BETWEEN #{from} AND #{to}
 		AND availability_count = 0
 	</select>
 
 	<!-- サイト空き状況減算処理（在庫時間と予約時間が重なっていればOK） -->
 	<update id="reduceAvailabilityCount">
 		UPDATE facility_availability
-		SET availability_count = availability_count - 1
+		SET availability_count =
+		availability_count - 1
 		WHERE
 		calendar_date = #{date}
-		AND facility_type_id = #{facilityTypeId}
+		AND facility_type_id
+		= #{facilityTypeId}
 		AND NOT (
 		end_time &lt;= #{startTime}
-		OR start_time &gt;= #{endTime}
+		OR start_time
+		&gt;= #{endTime}
 		)
 	</update>
 
@@ -68,7 +73,8 @@
 		FROM
 		facility_availability
 		WHERE
-		facility_type_id = #{facilityTypeId}
+		facility_type_id =
+		#{facilityTypeId}
 		AND calendar_date = #{date}
 	</select>
 
@@ -83,11 +89,25 @@
 		FROM
 		facility_availability
 		WHERE
-		facility_type_id = #{facilityTypeId}
+		facility_type_id =
+		#{facilityTypeId}
 		AND calendar_date = #{date}
-		AND start_time &lt; #{endTime}
+		AND start_time &lt;
+		#{endTime}
 		AND end_time &gt; #{startTime}
 		AND availability_count &gt; 0
 	</select>
+
+	<!-- -->
+	<update id="restoreAvailabilityCount">
+		UPDATE facility_availability
+		SET availability_count = availability_count + 1
+		WHERE facility_type_id = #{facilityTypeId}
+		AND calendar_date = #{date}
+		AND start_time = #{startTime}
+		AND end_time = #{endTime}
+	</update>
+
+
 
 </mapper>

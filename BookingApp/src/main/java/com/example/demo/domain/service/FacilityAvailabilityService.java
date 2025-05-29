@@ -55,5 +55,12 @@ public class FacilityAvailabilityService {
         return facilityAvailabilityMapper.reduceAvailabilityCount(facilityTypeId, date, startTime, endTime);
     }
     
+    /**
+     * 空き数を1増やす（キャンセル時の空き戻し）
+     */
+    public int restoreAvailabilityCount(Integer facilityTypeId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        return facilityAvailabilityMapper.restoreAvailabilityCount(facilityTypeId, date, startTime, endTime);
+    }
+    
     
 }
