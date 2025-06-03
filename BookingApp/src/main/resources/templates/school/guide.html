@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" 
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>施設利用規約</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 <body>
-    <div layout:fragment="content">
-        <div class="container mt-5">
-			<li style="height: 1em; list-style: none;"></li>  <!-- 空の liだけどマークは非表示で高さだけ確保 -->
-            <h2 class="mb-4">施設利用規約</h2>
+<div class="container mt-5">
+    <h2 class="mb-4">施設利用規約</h2>
 
     <!-- タブ -->
     <ul class="nav nav-tabs" id="facilityTab" role="tablist">
@@ -45,113 +41,21 @@
             </h2>
             <div id="collapseRules" class="accordion-collapse collapse" aria-labelledby="headingRules" data-bs-parent="#karaokeAccordion">
                 <div class="accordion-body">
-                    <ol>
-                        <li><strong>利用時間を厳守：</strong>15時30分～17時30分の間に利用してください。</li>
-                        <li><strong>音量に注意：</strong>
-                            <ul>
-                                <li>近隣の迷惑になるため音量は初期設定のままで使用し、ボリュームを上げないでください。</li>
-                                <li>近隣から苦情があった場合は利用停止となる可能性があります。</li>
-                                <li>必要以上に大声を出さないようにしましょう！</li>
-                            </ul>
-                        </li>
-                        <li><strong>ルーム内での喫煙・飲酒は禁止：</strong>
-                            <ul>
-                                <li>ソフトドリンク、食事はOKです。終了後は片付けをお願いします。</li>
-                                <li>違反が発覚した場合は次回以降利用停止となります。</li>
-                            </ul>
-                        </li>
-                        <li><strong>機材は丁寧に扱うこと：</strong>
-                            <ul>
-                                <li>マイク・リモコン・モニターは精密機器です。乱暴に扱わないでください。</li>
-                                <li>機器破損の場合は弁償となります。</li>
-                            </ul>
-                        </li>
-                        <li><strong>終了後は後片付けを行う：</strong>
-                            <ul>
-                                <li>清潔な環境を保つために、きちんと後片付けをしてゴミは1階のゴミ箱に捨ててください。</li>
-                                <li>机・椅子等を移動した場合は原状復帰をお願いします。</li>
-                            </ul>
-                        </li>
-                        <li><strong>みんなで楽しみましょう：</strong>
-                            <ul>
-                                <li>他の利用者への配慮を忘れず、快適な環境を維持しましょう。</li>
-                                <li>ルールを守って楽しいカラオケタイムを過ごしましょう！</li>
-                            </ul>
-                        </li>
-                    </ol>
-                    <p>何かあれば、1～6号館管理部窓口までご連絡ください。</p>
+                    <iframe src="/pdf/krc_karaoke.pdf" width="100%" height="2350px"></iframe>
                 </div>
             </div>
         </div>
 
-        <!-- 2. 機器操作 -->
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingEquipment">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEquipment" aria-expanded="false" aria-controls="collapseEquipment">
-                    2. カラオケ機器操作について（4号館2階カラオケルーム）
-                </button>
-            </h2>
-            <div id="collapseEquipment" class="accordion-collapse collapse" aria-labelledby="headingEquipment" data-bs-parent="#karaokeAccordion">
-                <div class="accordion-body">
-                    <h6>使用時</h6>
-                    <ol>
-                        <li>ディスプレイのメインスイッチON</li>
-                        <li>ターミナル「LIVEDAM Ai」の左下ボタンを長押し（ランプ赤→緑に変わればOK）</li>
-                        <li>しばらくしてTVモニター、ターミナルとも起動します。</li>
-                        <li>※ボリュームは初期設定から上げないようにお願いします。（近隣に迷惑をかけないため）</li>
-                        <li>キー（♭#）・テンポは変更可能です。</li>
-                    </ol>
-                    <h6>終了時</h6>
-                    <ol>
-                        <li>室内のゴミ回収、椅子・機器等を所定の場所に戻す。</li>
-                        <li>ターミナル「LIVEDAM Ai」の左下ボタンを長押し（ランプ緑→赤に変わればOK）</li>
-                        <li>しばらくしてターミナルがシャットダウンします。</li>
-                        <li>ディスプレイのメインスイッチOFF</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. 利用規約 -->
+        
+        <!-- 2. 利用規約 -->
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingTerms">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTerms" aria-expanded="false" aria-controls="collapseTerms">
-                    3. KRCカラオケルーム 利用規約
+                    2. KRCカラオケルーム 利用規約
                 </button>
             </h2>
             <div id="collapseTerms" class="accordion-collapse collapse" aria-labelledby="headingTerms" data-bs-parent="#karaokeAccordion">
-                <div class="accordion-body">
-                    <p>学生の交流・リフレッシュの場として、カラオケルームを開設しました。以下の利用規約をよく読み、ルールを守って楽しくご利用ください。</p>
-                    <h6>利用申込の優先順位</h6>
-                    <ol>
-                        <li>クラス会・クラブ懇親会・学級行事など</li>
-                        <li>グループ利用（5人以上）</li>
-                    </ol>
-                    <h6>利用可能時間</h6>
-                    <p>1日1組限定予約制<br>
-                    月火木金：15:30 ～ 17:30 ※学校休館日は除く<br>
-                    水：歌唱クラブ</p>
-                    <h6>予約方法</h6>
-                    <p>
-                        本サイトから予約してください。<br>
-                        当日、申込責任者が窓口でカラオケルームの鍵を受け取ってください。
-                    </p>
-                    <h6>利用機材</h6>
-                    <p>カラオケ本体：DAM（1台）<br>
-                    マイク：2本<br>
-                    電源の入れ方・切り方：電源スイッチを長押しでON/OFF</p>
-                    <h6>飲食について</h6>
-                    <p>飲食可。ただし汚さない・散らかさないこと。<br>
-                    ゴミは各自で持ち帰る、または所定の場所へ。<br>
-                    テーブル・床の拭き掃除を忘れずにお願いします。</p>
-                    <h6>注意事項</h6>
-                    <ul>
-                        <li>音量は適切なレベルを守りましょう（近隣教室への配慮）</li>
-                        <li>機材の扱いは丁寧に。破損時は弁償が必要です。</li>
-                        <li>利用後は、清掃・マイク戻し・電源OFF・鍵の返却をお願いします。</li>
-                    </ul>
-                    <p class="text-end"><strong>お問い合わせ・申込用紙提出先：</strong>1号館または6号館 管理窓口まで</p>
-                </div>
+                	<iframe src="/pdf/krc_gim.pdf" width="100%" height="1300px"></iframe>
             </div>
         </div>
 
@@ -162,65 +66,7 @@
         
 		<!--   ジムの利用規約     -->
         <div class="tab-pane fade" id="gym" role="tabpanel">
-    <h5 class="mt-3">KRCトレーニングジム 利用規約</h5>
-    <p>学生の皆さんの健康増進と満足度向上を目的として、校内に『トレーニングジム』を設置しました。以下の利用規約を守り、快適で安全な環境をみんなで作りましょう。</p>
-
-    <ol class="mt-4">
-        <li class="mb-4">
-            <strong>利用対象者：</strong><br>
-            本校の在籍学生
-        </li>
-        <li class="mb-4">
-            <strong>利用可能時間：</strong><br>
-            平日 15:30 ～ 17:30<br>
-            <small class="text-muted">※左記以外の利用は禁止します</small>
-        </li>
-        <li class="mb-4">
-            <strong>利用方法：</strong><br>
-            予約不要です。空いている機材を自由にご利用いただけます。<br>
-            利用開始時・終了時に、入口に設置された使用者ボードに<br>
-            「クラス・氏名・使用時間帯・使用機材」を記入してください。
-        </li>
-        <li class="mb-4">
-            <strong>機材一覧：</strong>
-            <ul>
-                <li>トレッドミル（ランニングマシン）：5台</li>
-                <li>アップライトバイク（エアロバイク）：3台</li>
-            </ul>
-        </li>
-        <li class="mb-4">
-            <strong>使用時間の制限：</strong><br>
-            一人が同一機材を使用できる時間は、最大60分までとします。<br>
-            複数人での譲り合いを心がけてください。
-        </li>
-        <li class="mb-4">
-            <strong>衛生管理：</strong><br>
-            使用後は、備え付けのアルコールティッシュで汗などを拭き取ってください。<br>
-            次の人が気持ちよく使用できるよう、ご協力をお願いします。
-        </li>
-        <li class="mb-4">
-            <strong>飲食について：</strong><br>
-            飲み物の持ち込みは可能です（水筒・ペットボトルなど）。<br>
-            食事（軽食・お菓子含む）は禁止とします。
-        </li>
-        <li class="mb-4">
-            <strong>禁止事項：</strong>
-            <ul>
-                <li>機材の乱暴な扱い</li>
-                <li>トレーニング目的以外の使用</li>
-                <li>裸足での利用（必ず運動用シューズを着用）</li>
-                <li>他の利用者の迷惑となる行為</li>
-            </ul>
-        </li>
-        <li class="mb-4">
-            <strong>その他：</strong><br>
-            機材に異常があった場合は、速やかに職員まで報告してください。<br>
-            利用規約を守らない場合、利用を制限させていただくことがあります。
-        </li>
-    </ol>
-
-    <p class="mt-4"><strong>安全・清潔・譲り合い</strong>を大切に、みんなで快適なジム環境を作っていきましょう！</p>
-    <p class="text-end">専門学校 国際理工カレッジ</p>
+    <iframe src="/pdf/krc_karaokeruru.pdf" width="100%" height="1250px"></iframe>
 </div>
 
 
@@ -249,6 +95,7 @@
             <p>快適かつ円滑に利用できるよう、ご協力をお願いいたします。</p>
         </div>
 
+	
     </div>
 
     <div class="mt-4">
