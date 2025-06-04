@@ -1,0 +1,75 @@
+/* gym.css */
+
+.equipment-box {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.status-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-in-use,
+.status-not-in-use {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.status-in-use {
+  color: #b30000;
+  background-color: #ffe5e5;
+}
+
+.status-not-in-use {
+  color: #006600;
+  background-color: #e5ffe5;
+}
+
+.in-use {
+  background-color: #ffcccc;
+  color: #b30000;
+}
+
+.not-in-use {
+  background-color: #ccffcc;
+  color: #006600;
+}
+
+.equipment-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.view-toggle-btns button {
+  margin-left: 8px;
+}
+
+.map-view {
+  display: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}

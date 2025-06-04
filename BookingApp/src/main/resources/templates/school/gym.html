@@ -7,75 +7,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>ジム利用状況</title>
-  <style>
-    .equipment-box {
-      width: 120px;
-      height: 120px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 16px;
-      font-weight: bold;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
 
-    .status-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .status-in-use,
-    .status-not-in-use {
-      display: inline-block;
-      min-width: 60px;
-      text-align: center;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-
-    .status-in-use {
-      color: #b30000;
-      background-color: #ffe5e5;
-    }
-
-    .status-not-in-use {
-      color: #006600;
-      background-color: #e5ffe5;
-    }
-
-    .in-use {
-      background-color: #ffcccc;
-      color: #b30000;
-    }
-
-    .not-in-use {
-      background-color: #ccffcc;
-      color: #006600;
-    }
-
-    .equipment-icon {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
-
-    .header-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .view-toggle-btns button {
-      margin-left: 8px;
-    }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/gym.css}" />
 
   <script th:inline="javascript">
     function toggleView(mode) {
@@ -92,6 +25,70 @@
     }
   </script>
 </head>
+<body>
+<main layout:fragment="content">
+  <div class="container" style="padding-top: 100px;">
+
+    <!-- ヘッダー：タイトルと切替ボタン横並び -->
+    <div class="header-section">
+      <h3 class="page-title mb-0">ジム利用状況</h3>
+      <div class="view-toggle-btns">
+        <button class="btn btn-primary" onclick="toggleView('list')">リスト表示</button>
+        <button class="btn btn-primary" onclick="toggleView('map')">マップ表示</button>
+      </div>
+    </div>
+
+    <!-- gymEquipmentList が存在する場合 -->
+    <div th:if="${gymEquipmentList != null}">
+      <!-- リスト表示 -->
+      <div id="listView">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>状態/機器名</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="equipment : ${gymEquipmentList}">
+              <td>
+                <div class="status-wrapper">
+                  <span th:if="${equipment.inUse}" class="status-in-use">利用中</span>
+                  <span th:if="${!equipment.inUse}" class="status-not-in-use">利用可</span>
+                  <span th:text="${equipment.equipmentName}">エアロバイク</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- マップ表示 -->
+      <div id="mapView" class="map-view" style="display: none; flex-wrap: wrap; gap: 12px;">
+        <div th:each="equipment : ${gymEquipmentList}" class="equipment-box"
+             th:classappend="${equipment.inUse} ? 'in-use' : 'not-in-use'">
+          <span class="equipment-icon"
+                th:text="${#strings.contains(equipment.equipmentName, 'バイク')} ? '🚲' : '🏃'"></span>
+          <div th:text="${equipment.equipmentName}">エアロバイク</div>
+          <div th:if="${equipment.inUse}">利用中</div>
+          <div th:if="${!equipment.inUse}">利用可</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- gymEquipmentList が null の場合 -->
+    <div th:if="${gymEquipmentList == null}">
+      <p>ジム機器の情報が取得できませんでした。</p>
+    </div>
+
+    <!-- 戻るボタン -->
+    <div class="form-group row pt-4">
+      <input type="button" value="戻る" class="btn btn-secondary btn-block" onclick="history.back()">
+    </div>
+  </div>
+</main>
+</body>
+</html>
+
 
 <body>
 <main layout:fragment="content">
