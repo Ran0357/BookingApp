@@ -27,7 +27,7 @@
 </head>
 <body>
 <main layout:fragment="content">
-  <div class="container" style="padding-top: 100px;">
+  <div class="container" style="padding-top: 65px;">
 
     <!-- ヘッダー：タイトルと切替ボタン横並び -->
     <div class="header-section">
@@ -78,76 +78,6 @@
     <!-- gymEquipmentList が null の場合 -->
     <div th:if="${gymEquipmentList == null}">
       <p>ジム機器の情報が取得できませんでした。</p>
-    </div>
-
-    <!-- 戻るボタン -->
-    <div class="form-group row pt-4">
-      <input type="button" value="戻る" class="btn btn-secondary btn-block" onclick="history.back()">
-    </div>
-  </div>
-</main>
-</body>
-</html>
-
-
-<body>
-<main layout:fragment="content">
-  <div class="container" style="padding-top: 100px;">
-
-    <!-- ヘッダー：タイトルと切替ボタン横並び -->
-    <div class="header-section">
-      <h3 class="page-title mb-0">ジム利用状況</h3>
-      <div class="view-toggle-btns">
-        <button class="btn btn-primary" onclick="toggleView('list')">リスト表示</button>
-        <button class="btn btn-primary" onclick="toggleView('map')">マップ表示</button>
-      </div>
-    </div>
-
-    <!-- gymEquipmentList が存在する場合 -->
-    <div th:if="${gymEquipmentList != null}">
-      <!-- リスト表示 -->
-      <div id="listView">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>状態/機器名</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="equipment : ${gymEquipmentList}">
-              <td>
-                <div class="status-wrapper">
-                  <span th:if="${equipment.inUse}" class="status-in-use">利用中</span>
-                  <span th:if="${!equipment.inUse}" class="status-not-in-use">利用可</span>
-                  <span th:text="${equipment.equipmentName}">エアロバイク</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- マップ表示 -->
-      <div id="mapView" class="map-view" style="display: none; flex-wrap: wrap; gap: 12px;">
-        <div th:each="equipment : ${gymEquipmentList}" class="equipment-box"
-             th:classappend="${equipment.inUse} ? 'in-use' : 'not-in-use'">
-          <span class="equipment-icon"
-                th:text="${#strings.contains(equipment.equipmentName, 'バイク')} ? '🚲' : '🏃'"></span>
-          <div th:text="${equipment.equipmentName}">エアロバイク</div>
-          <div th:if="${equipment.inUse}">利用中</div>
-          <div th:if="${!equipment.inUse}">利用可</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- gymEquipmentList が null の場合 -->
-    <div th:if="${gymEquipmentList == null}">
-      <p>ジム機器の情報が取得できませんでした。</p>
-    </div>
-
-    <!-- 戻るボタン -->
-    <div class="form-group row pt-4">
-      <input type="button" value="戻る" class="btn btn-secondary btn-block" onclick="history.back()">
     </div>
   </div>
 </main>
