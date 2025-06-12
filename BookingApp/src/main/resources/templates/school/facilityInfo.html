@@ -34,39 +34,44 @@
 						</div>
 					</div>
 
-					<!-- 開始時間 -->
-					<div class="form-group row" th:if="${facilityUseForm.facilityId == 1}">
-						<label class="col-md-3 col-form-label">開始時間</label>
-						<div class="col-md-5">
-							<input type="time" class="form-control" value="15:30" readonly>
-							<input type="hidden" th:field="*{startTime}" value="15:30" />
+					<!-- facilityId == 1 (カラオケ) -->
+					<div th:if="${facilityUseForm.facilityId == 1}">
+						<div class="form-group row">
+							<label class="col-md-3 col-form-label">開始時間</label>
+							<div class="col-md-5">
+								<input type="time" id="startTimeOnly" th:field="*{startTimeOnly}" class="form-control"
+									readonly>
+							</div>
 						</div>
-					</div>
-					<div class="form-group row" th:if="${facilityUseForm.facilityId != 1}">
-						<label for="startTime" class="col-md-3 col-form-label">開始時間 <span
-								class="badge bg-warning text-dark">必須</span></label>
-						<div class="col-md-5">
-							<input type="time" class="form-control" th:field="*{startTime}" th:errorclass="is-invalid">
-							<div class="invalid-feedback" th:errors="*{startTime}"></div>
+						<div class="form-group row">
+							<label class="col-md-3 col-form-label">終了時間</label>
+							<div class="col-md-5">
+								<input type="time" id="endTimeOnly" th:field="*{endTimeOnly}" class="form-control"
+									readonly>
+
+							</div>
 						</div>
 					</div>
 
-					<!-- 終了時間 -->
-					<div class="form-group row" th:if="${facilityUseForm.facilityId == 1}">
-						<label class="col-md-3 col-form-label">終了時間</label>
-						<div class="col-md-5">
-							<input type="time" class="form-control" value="17:30" readonly>
-							<input type="hidden" th:field="*{endTime}" value="17:30" />
+
+					<!-- facilityId != 1 (ブースやジム) -->
+					<div th:if="${facilityUseForm.facilityId != 1}">
+						<div class="form-group row">
+							<label for="startTimeOnly" class="col-md-3 col-form-label">開始時間</label>
+							<div class="col-md-5">
+								<input type="time" id="startTimeOnly" th:field="*{startTimeOnly}" class="form-control">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="endTimeOnly" class="col-md-3 col-form-label">終了時間</label>
+							<div class="col-md-5">
+								<input type="time" id="endTimeOnly" th:field="*{endTimeOnly}" class="form-control">
+
+							</div>
 						</div>
 					</div>
-					<div class="form-group row" th:if="${facilityUseForm.facilityId != 1}">
-						<label for="endTime" class="col-md-3 col-form-label">終了時間 <span
-								class="badge bg-warning text-dark">必須</span></label>
-						<div class="col-md-5">
-							<input type="time" class="form-control" th:field="*{endTime}" th:errorclass="is-invalid">
-							<div class="invalid-feedback" th:errors="*{endTime}"></div>
-						</div>
-					</div>
+
+
 
 					<!-- 利用人数 -->
 					<div class="form-group row">

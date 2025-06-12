@@ -3,6 +3,7 @@ package com.example.demo.application.service.api;
 import static java.time.format.DateTimeFormatter.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,11 +44,17 @@ public class FacilityAvailabilityRestAppService {
 			throw new RuntimeException();
 		}
 
-		return result.stream().map(element -> new ResultFacilityAvailability(
-				generateTitle(element.getAvailabilityCount(), facilityTypeId),
-				element.getDate(),
-				generateUrl(element.getAvailabilityCount(), element.getFacilityTypeId(), element.getDate())))
-				.collect(Collectors.toList());
+		return result.stream().map(element -> {
+		    LocalDateTime start = LocalDateTime.of(element.getDate(), element.getStartTime());
+		    LocalDateTime end = LocalDateTime.of(element.getDate(), element.getEndTime());
+		    
+		    return new ResultFacilityAvailability(
+		        generateTitle(element.getAvailabilityCount(), facilityTypeId),
+		        start,
+		        end,
+		        generateUrl(element.getAvailabilityCount(), facilityTypeId, element.getDate(), start, end)
+		    );
+		}).collect(Collectors.toList());
 	}
 
 	/**
@@ -64,23 +71,34 @@ public class FacilityAvailabilityRestAppService {
 		//ブースは3つ以上あれば◎、1つあれば△,0なら×
 
 		String title = "";
-		if (facilityTypeId == 1) {
-			title = availabilityCount == 0 ? "×" : "◎";
-		} else if (facilityTypeId == 2) {
-			title = "予約なし";
-		} else if (facilityTypeId == 3) {
-			title = availabilityCount >= 3 ? "◎" : availabilityCount > 0 ? "△" : "×";
-		}
+		if (availabilityCount == 0) {
+		    title = "×";
+		} else if (availabilityCount == 1) {
+		    title = "◎";
+		} 
+
 		return title;
 	}
 
-	private String generateUrl(int availabilityCount, int facilityTypeId, LocalDate useDate) {
+	private String generateUrl(int availabilityCount, int facilityTypeId, LocalDate useDate, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
-		String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/school/facilityInfo")
-				.queryParam("facilityId", facilityTypeId)
-				.queryParam("useDate", useDate.format(ISO_LOCAL_DATE))
-				.toUriString();
+		if (facilityTypeId == 1) {
+			String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/school/facilityInfo")
+					.queryParam("facilityId", facilityTypeId)
+					.queryParam("useDate", useDate.format(ISO_LOCAL_DATE))
+					.toUriString();
+			return availabilityCount == 0 ? "" : url;
+		} else if (facilityTypeId == 3) {
+			String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/school/facilityInfo")
+					.queryParam("facilityId", facilityTypeId)
+					.queryParam("useDate", useDate.format(ISO_LOCAL_DATE))
+					.queryParam("startDateTime",startDateTime)
+					.queryParam("endDateTime", endDateTime)
+					.toUriString();
+			return availabilityCount == 0 ? "" : url;
+		} 
+		
 
-		return availabilityCount == 0 ? "" : url;
+		return ""; // ジムは予約がないためURLは生成しない
 	}
 }

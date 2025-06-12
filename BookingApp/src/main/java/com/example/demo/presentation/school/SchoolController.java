@@ -1,6 +1,7 @@
 package com.example.demo.presentation.school;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Locale;
 
@@ -42,30 +43,30 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequestMapping("/school")
 public class SchoolController {
-	
+
 	private final SchoolAppService schoolAppService;
 	private final ReserveAppService reserveAppService;
-	private final GymEquipmentService gymEquipmentService;  // 追加
+	private final GymEquipmentService gymEquipmentService; // 追加
 	private final FacilityUseFormValidator facilityUseFormValidator;
 	private final HttpSession session;
 	private final ModelMapper modelMapper;
 	private final MessageSource messageSource;
-	
+
 	@InitBinder("facilityUseForm")
 	public void initBinder(WebDataBinder binder) {
 		binder.addValidators(facilityUseFormValidator);
 	}
-	
+
 	@ModelAttribute
 	public FacilityUseForm setUpFacilityUseForm() {
 		return new FacilityUseForm();
 	}
-	
+
 	@ModelAttribute
 	public UserInfoForm setUpUserInfoForm() {
 		return new UserInfoForm();
 	}
-	
+
 	/**
 	 * 施設タイプ一覧表示
 	 */
@@ -74,22 +75,25 @@ public class SchoolController {
 		model.addAttribute("facilityTypeList", schoolAppService.findAllFacilityType());
 		return "school/facilityTypes";
 	}
-	
+
 	/**
 	 * スケジュール表示
 	 */
 	@GetMapping(value = "/schedule", params = "facilityTypeId")
 	public String schedule(@RequestParam("facilityTypeId") int facilityTypeId, Model model) {
-	    model.addAttribute("facilityTypeId", facilityTypeId);
-	    model.addAttribute("facilityTypeName", schoolAppService.findFacilityTypeName(facilityTypeId));
+		model.addAttribute("facilityTypeId", facilityTypeId);
+		model.addAttribute("facilityTypeName", schoolAppService.findFacilityTypeName(facilityTypeId));
 
-	    if (facilityTypeId == 2) {
-	        // 利用状況も取得するように修正
-	        model.addAttribute("gymEquipmentList", gymEquipmentService.findCurrentStatus());
-	        return "school/gym";
-	    }
-
-	    return "school/schedule";
+		switch (facilityTypeId) {
+		case 1: // カラオケ
+			return "school/schedule";
+		case 2: // ジム
+			model.addAttribute("gymEquipmentList", gymEquipmentService.findCurrentStatus());
+			return "school/gym";
+		case 3: // ブース
+			return "school/schedule2";
+		}
+		return "school/facilityTypes";
 	}
 
 	/**
@@ -100,53 +104,58 @@ public class SchoolController {
 		// 利用状況を含むリスト取得
 		var list = gymEquipmentService.findCurrentStatus();
 		model.addAttribute("gymEquipmentList", list);
-		return "school/gym";  // gym-status.html に対応
+		return "school/gym"; // gym-status.html に対応
 	}
-	
+
 	@GetMapping("/gym/equipment/toggle")
 	public String toggleEquipmentUseStatus(@RequestParam("id") Integer equipmentId, Model model) {
-	    // 該当機器の情報取得
-	    GymEquipment equipment = gymEquipmentService.findById(equipmentId);
-	    if (equipment == null) {
-	        model.addAttribute("message", "該当する機器が見つかりません。");
-	        return "gym/toggleResult";
-	    }
+		// 該当機器の情報取得
+		GymEquipment equipment = gymEquipmentService.findById(equipmentId);
+		if (equipment == null) {
+			model.addAttribute("message", "該当する機器が見つかりません。");
+			return "gym/toggleResult";
+		}
 
-	    // 利用状況を反転して更新
-	    boolean newStatus = !equipment.isInUse();
-	    boolean updated = gymEquipmentService.updateUseStatus(equipmentId, newStatus);
+		// 利用状況を反転して更新
+		boolean newStatus = !equipment.isInUse();
+		boolean updated = gymEquipmentService.updateUseStatus(equipmentId, newStatus);
 
-	    if (!updated) {
-	        model.addAttribute("message", "状態の更新に失敗しました。");
-	        return "gym/toggleResult";
-	    }
+		if (!updated) {
+			model.addAttribute("message", "状態の更新に失敗しました。");
+			return "gym/toggleResult";
+		}
 
-	    // メッセージセット（使用中になったかどうかで文言変える）
-	    String msg = newStatus ? "使用中になりました。" : "お疲れさまでした。";
-	    model.addAttribute("message", msg);
-	    model.addAttribute("equipmentName", equipment.getEquipmentName());
+		// メッセージセット（使用中になったかどうかで文言変える）
+		String msg = newStatus ? "使用中になりました。" : "お疲れさまでした。";
+		model.addAttribute("message", msg);
+		model.addAttribute("equipmentName", equipment.getEquipmentName());
 
-	    return "school/toggleResult"; // 切り替え結果表示用テンプレート
+		return "school/toggleResult"; // 切り替え結果表示用テンプレート
 	}
 
-	
 	/**
 	 * 施設情報画面
 	 */
 	@GetMapping("/facilityInfo")
 	public String facilityInfo(
-	    @RequestParam("facilityId") int facilityTypeId,
-	    @RequestParam("useDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate useDate,
-	    FacilityUseForm facilityUseForm
-	) {
-	    // フォームに値セット
-	    facilityUseForm.setFacilityId(facilityTypeId);
-	    facilityUseForm.setUseDate(useDate);
+			@RequestParam("facilityId") int facilityTypeId,
+			@RequestParam("useDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate useDate,
+			@RequestParam(value = "startDateTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+			@RequestParam(value = "endDateTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
+			FacilityUseForm facilityUseForm, Model model) {
+		facilityUseForm.setFacilityId(facilityTypeId);
+		facilityUseForm.setUseDate(useDate);
+		facilityUseForm.setFacilityName(schoolAppService.findFacilityTypeName(facilityTypeId));
 
-	    String facilityTypeName = schoolAppService.findFacilityTypeName(facilityTypeId);
-	    facilityUseForm.setFacilityName(facilityTypeName);
+		if (startDateTime != null && endDateTime != null) {
+			facilityUseForm.setStartDateTime(startDateTime);
+			facilityUseForm.setEndDateTime(endDateTime);
+		} else if (facilityTypeId == 1) { // カラオケはデフォルト時間セット
+			facilityUseForm.setStartDateTime(useDate.atTime(15, 30));
+			facilityUseForm.setEndDateTime(useDate.atTime(17, 30));
+		}
 
-	    return "school/facilityInfo";
+		return "school/facilityInfo";
 	}
 
 	/**
@@ -154,12 +163,22 @@ public class SchoolController {
 	 */
 	@PostMapping(value = "/facilityInfo", params = "member")
 	public String sendToReserve(@ModelAttribute FacilityUseForm facilityUseForm, BindingResult result) {
+		LocalDate useDate = facilityUseForm.getUseDate(); // 利用日を取得
+		LocalTime startTime = facilityUseForm.getStartTimeOnly(); // 開始時間を取得
+		LocalTime endTime = facilityUseForm.getEndTimeOnly();;
+
 		if (facilityUseForm.getFacilityId() == 1) {
-	        facilityUseForm.setStartTime(LocalTime.of(15, 30));
-	        facilityUseForm.setEndTime(LocalTime.of(17, 30));
+	        facilityUseForm.setStartDateTime(useDate.atTime(15, 30));
+	        facilityUseForm.setEndDateTime(useDate.atTime(17, 30));
+	    } else {
+	        // ブースならフォーム入力値を元に組み立て
+	        if (startTime != null && endTime!= null) {
+	            facilityUseForm.setStartDateTime(useDate.atTime(startTime));
+	            facilityUseForm.setEndDateTime(useDate.atTime(endTime));
+	        }
 	    }
 
-	    facilityUseFormValidator.validate(facilityUseForm, result);
+		facilityUseFormValidator.validate(facilityUseForm, result);
 		if (result.hasErrors()) {
 			return "school/facilityInfo";
 		}
@@ -167,7 +186,7 @@ public class SchoolController {
 		System.out.println("SessionにfacilityUseFormSessionセット完了: " + facilityUseForm);
 		return "redirect:/school/member/reserve?confirm";
 	}
-	
+
 	/**
 	 * 予約内容確認（会員）
 	 */
@@ -175,8 +194,7 @@ public class SchoolController {
 	public String confirmByMember(@AuthenticationPrincipal AuthenticatedMember authenticatedMember, Model model) {
 		FacilityUseForm facilityUseForm = (FacilityUseForm) session.getAttribute("facilityUseFormSession");
 		System.out.println("Sessionから取得したfacilityUseFormSession: " + facilityUseForm);
-		FacilityReservationInfo facilityInfo = modelMapper.map(facilityUseForm, FacilityReservationInfo.class);
-
+		FacilityReservationInfo facilityInfo = FacilityReservationInfo.from(facilityUseForm);
 		Member member = reserveAppService.findMemberById(authenticatedMember.getId());
 		UserInfo userInfo = new UserInfo();
 		userInfo.setId(member.getId());
@@ -187,30 +205,30 @@ public class SchoolController {
 		model.addAttribute("reservation", reservation);
 		model.addAttribute("userInfoForm", userInfoForm);
 		model.addAttribute("facilityUseForm", facilityUseForm);
-		
+
 		return "school/confirm";
 	}
-	
+
 	/**
 	 * 予約（会員）
 	 */
 	@PostMapping("/member/reserve")
 	public String reserveByMember(@AuthenticationPrincipal AuthenticatedMember authenticatedMember,
-								  @Validated FacilityUseForm facilityUseForm, BindingResult result) {
+			@Validated FacilityUseForm facilityUseForm, BindingResult result) {
 
 		if (result.hasErrors()) {
 			boolean outOfStockFlg = result.getFieldErrors()
-				.stream()
-				.anyMatch(e -> e.getCode().equals("validation.custom.siteIsNotAvailable"));
+					.stream()
+					.anyMatch(e -> e.getCode().equals("validation.custom.siteIsNotAvailable"));
 
 			if (outOfStockFlg) {
-				throw new BusinessException(messageSource.getMessage("exception.siteIsNotAvailable", null, Locale.JAPAN));
+				throw new BusinessException(
+						messageSource.getMessage("exception.siteIsNotAvailable", null, Locale.JAPAN));
 			}
 			throw new SystemException(messageSource.getMessage("exception.errorAtCreate", null, Locale.JAPAN));
 		}
 
-		FacilityReservationInfo facilityInfo = modelMapper.map(facilityUseForm, FacilityReservationInfo.class);
-
+		FacilityReservationInfo facilityInfo = FacilityReservationInfo.from(facilityUseForm);
 		UserInfo userInfo = new UserInfo();
 		userInfo.setId(authenticatedMember.getId());
 
@@ -219,7 +237,7 @@ public class SchoolController {
 
 		return "redirect:/school/member/reserve?complete";
 	}
-	
+
 	/**
 	 * 予約完了画面（会員）
 	 */
@@ -227,13 +245,12 @@ public class SchoolController {
 	public String completeByMember() {
 		return "school/complete";
 	}
-	
+
 	/**
 	 */
-	    @GetMapping("/guide")
-	    public String showFacilityGuidePage() {
-	        return "school/guide"; 
-	    }
+	@GetMapping("/guide")
+	public String showFacilityGuidePage() {
+		return "school/guide";
+	}
 
-	
 }

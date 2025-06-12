@@ -1,5 +1,6 @@
 package com.example.demo.domain.service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -43,9 +44,10 @@ public class FacilityAvailabilityService {
      * 時間帯の空き状況確認（例: ブース、ジム）
      */
     public boolean isAvailableForTimeRange(int facilityTypeId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        List<FacilityAvailability> list = facilityAvailabilityMapper.findFacilityAvailabilityForTimeRange(facilityTypeId, date, startTime, endTime);
-        System.out.println("空き状況ヒット件数: " + list.size());
-        return !list.isEmpty();
+    	 int slotCount = (int) (Duration.between(startTime, endTime).toMinutes() / 15);
+    	    List<FacilityAvailability> list = facilityAvailabilityMapper
+    	        .findFacilityAvailabilityForTimeRange(facilityTypeId, date, startTime, endTime);
+    	    return list.size() == slotCount;
     }
 
     /**
@@ -61,6 +63,5 @@ public class FacilityAvailabilityService {
     public int restoreAvailabilityCount(Integer facilityTypeId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return facilityAvailabilityMapper.restoreAvailabilityCount(facilityTypeId, date, startTime, endTime);
     }
-    
-    
+
 }

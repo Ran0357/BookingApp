@@ -65,3 +65,89 @@ div.fc-sticky {
     max-height: 700px;
   }
 }
+.time-slot {
+	padding: 8px;
+	margin: 4px 0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.time-slot:hover {
+	background-color: #eef;
+	cursor: pointer;
+}
+/* schedule.css */
+
+/* FullCalendarの閉鎖日をハイライト */
+.fc-closed-date {
+  background-color: #f2f2f2; /* 薄い灰色 */
+  opacity: 0.7;
+  pointer-events: none; /* クリック不可に */
+}
+
+/* 通知コンテナのスタイル */
+#notificationContainer {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1050; /* Bootstrap modal z-indexより高く */
+  width: 300px;
+}
+
+/* --- FullCalendar イベントのカスタムスタイル --- */
+
+/* 既存の予約済みイベントの表示スタイル（画像のような「◎」を想定） */
+/* FullCalendarのデフォルトのイベント表示を上書き */
+.fc-event-time,
+.fc-event-title {
+  padding: 0; /* デフォルトのパディングをなくす */
+  text-align: center; /* 中央揃え */
+  height: 100%; /* 親要素に合わせる */
+  display: flex; /* Flexboxを使って中央揃え */
+  align-items: center; /* 垂直方向中央 */
+  justify-content: center; /* 水平方向中央 */
+}
+
+.fc-event {
+  cursor: pointer; /* マウスカーソルをポインターにする */
+}
+
+/* 既存の予約済みイベント（◎、△、×）用のスタイル */
+.custom-event-display {
+  background-color: transparent !important; /* 背景透明 */
+  border: none !important; /* 枠線なし */
+  color: #000 !important; /* 文字色を黒に */
+  font-weight: bold;
+}
+
+/* 選択中のイベント（✔️）用のスタイル */
+.selected-slot-display {
+  background-color: #90ee90 !important; /* Light green */
+  border-color: #008000 !important; /* Dark green */
+  color: #000 !important; /* 文字色を黒に */
+  font-weight: bold;
+  opacity: 0.8; /* 重ねて表示されることを考慮して少し透明度を持たせる */
+}
+
+/* Legend dots (既存と同じ、なくても良いが、説明のため残す) */
+.dot {
+  height: 12px;
+  width: 12px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.fc-past-date {
+  background-color: #f0f0f0 !important;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.fc-closed-date {
+  background-color: #ffcccc !important;
+  pointer-events: none;
+  opacity: 0.6;
+}
+

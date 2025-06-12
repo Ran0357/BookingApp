@@ -89,15 +89,6 @@ document.addEventListener("DOMContentLoaded", function() {
 					const dateStr = dayjs(info.startStr).format("YYYY-MM-DD");
 					return !closedDates.includes(dateStr);
 				},
-				// クリック時に警告表示
-				dateClick: function(info) {
-					const dateStr = dayjs(info.dateStr).format("YYYY-MM-DD");
-					if (closedDates.includes(dateStr)) {
-						alert("この日は休館日のため予約できません。");
-						return;
-					}
-					// TODO: 有効日のクリック処理を書く（必要に応じて）
-				},
 				// 見た目をグレーアウト
 				dayCellClassNames: function(arg) {
 					const dateStr = dayjs(arg.date).format("YYYY-MM-DD");

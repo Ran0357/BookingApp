@@ -62,8 +62,8 @@ class SchoolControllerTest {
 		
 		facilityForm.setFacilityId(1);
 		facilityForm.setUseDate(LocalDate.of(2023, 10, 1));
-		facilityForm.setStartTime(java.time.LocalTime.of(10, 0));
-		facilityForm.setEndTime(java.time.LocalTime.of(12, 0));
+		facilityForm.setStartDateTime(java.time.LocalDateTime.of(0, 0, 10, 0, 0));
+		facilityForm.setEndDateTime(java.time.LocalDateTime.of(0, 0, 12, 0, 0));
 		facilityForm.setNumberOfPeople(2);
 		facilityForm.setFacilityName("カラオケ");
 		
