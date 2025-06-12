@@ -16,6 +16,26 @@
       <div class="row" th:each="facilityType : ${facilityTypeList}">
         <div class="col-lg-8 mt-3 offset-lg-2">
           <div class="card shadow-sm" style="max-width: 800px;">
+            
+            <!-- ▼ 画像のサイズ調整済み表示 -->
+            <img th:if="${facilityType.name == 'カラオケ'}"
+                 th:src="@{/img/karaoke.jpg}"
+                 class="card-img-top"
+                 style="height: 200px; object-fit: cover;"
+                 alt="カラオケ画像">
+
+            <img th:if="${facilityType.name == 'ジム'}"
+                 th:src="@{/img/gym.jpg}"
+                 class="card-img-top"
+                 style="height: 200px; object-fit: cover;"
+                 alt="ジム画像">
+
+            <img th:if="${facilityType.name == 'ブース'}"
+                 th:src="@{/img/booth.jpg}"
+                 class="card-img-top"
+                 style="height: 200px; object-fit: cover;"
+                 alt="ブース画像">
+
             <div class="card-body siteType-card-body">
               <h5 class="card-title" th:text="${facilityType.name}"></h5>
               <p class="card-text">
