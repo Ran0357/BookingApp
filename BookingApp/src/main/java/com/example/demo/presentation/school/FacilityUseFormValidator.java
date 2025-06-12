@@ -33,7 +33,10 @@ public class FacilityUseFormValidator implements Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 		FacilityUseForm facilityUseForm = (FacilityUseForm) target;
-		FacilityReservationInfo reservationInfo = modelMapper.map(facilityUseForm, FacilityReservationInfo.class);
+		System.out.println("startTime: " + facilityUseForm.getStartTimeOnly());
+		System.out.println("endTime: " + facilityUseForm.getEndTimeOnly());
+
+		FacilityReservationInfo reservationInfo = FacilityReservationInfo.from(facilityUseForm);
 		System.out.println("FacilityUseForm.facilityId: " + facilityUseForm.getFacilityId());
 
 		System.out.println("facilityId: " + reservationInfo.getFacilityId());
@@ -80,6 +83,7 @@ public class FacilityUseFormValidator implements Validator {
 	private void validateFacilityAvailability(Errors errors, FacilityReservationInfo info) {
 		FacilityType facilityType = facilityTypeService.findByFacilityTypeId(info.getFacilityId())
 			.orElseThrow(() -> new SystemException("施設情報が見つかりません"));
+		
 
 		int facilityTypeId = facilityType.getId(); // 施設タイプIDで分岐
 
@@ -92,9 +96,11 @@ public class FacilityUseFormValidator implements Validator {
 		} else {
 			// ジム・ブース（時間単位）
 			available = facilityAvailabilityService.isAvailableForTimeRange(
-				info.getFacilityId(), info.getUseDate(), info.getStartTime(), info.getEndTime());
+				    info.getFacilityId(), info.getUseDate(), info.getStartTime(), info.getEndTime());
+
 		}
 
+		
 		if (!available) {
 			errors.rejectValue("useDate", "validation.custom.facilityAvailabilityIncorrect");
 		}

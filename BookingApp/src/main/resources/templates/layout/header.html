@@ -14,7 +14,7 @@
         <div class="collapse navbar-collapse" id="navbar-content">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a href="/#reservationlist" class="nav-link">予約一覧</a>
+              <a href="/#reservationlist" class="nav-link">メニュー</a>
             </li>
           </ul>
           <ul class="navbar-nav">
@@ -22,9 +22,10 @@
             <li class="nav-item" sec:authorize="!isAuthenticated()"><a th:href="@{/login}" class="nav-link">ログイン</a></li>
             <li class="nav-item" sec:authorize="!isAuthenticated()"><a th:href="@{/signup}" class="nav-link">会員登録</a></li>
             <li class="nav-item" sec:authorize="isAuthenticated()">
-              <form th:action="@{/logout}" method="post">
-                <button class="btn nav-link" type="submit">ログアウト</button>
-              </form>
+<form th:action="@{/logout}" method="post" onsubmit="return confirm('本当にログアウトしますか？');">
+  <button class="btn nav-link" type="submit">ログアウト</button>
+</form>
+
             </li>
           </ul>
         </div>

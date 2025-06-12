@@ -61,7 +61,20 @@ document.addEventListener("DOMContentLoaded", function() {
 										const eventDate = dayjs(event.start).format("YYYY-MM-DD");
 										return !closedDates.includes(eventDate);
 									});
-									successCallback(filtered);
+									// ここから追加コード
+									const groupedEvents = {};
+									filtered.forEach(event => {
+										const day = dayjs(event.start).format("YYYY-MM-DD");
+										if (!groupedEvents[day]) {
+											groupedEvents[day] = {
+												title: event.title,
+												start: day,
+												allDay: true,
+												url: event.url
+											};
+										}
+									});
+									successCallback(Object.values(groupedEvents));
 								});
 							}
 						})
@@ -75,15 +88,6 @@ document.addEventListener("DOMContentLoaded", function() {
 				selectAllow: function(info) {
 					const dateStr = dayjs(info.startStr).format("YYYY-MM-DD");
 					return !closedDates.includes(dateStr);
-				},
-				// クリック時に警告表示
-				dateClick: function(info) {
-					const dateStr = dayjs(info.dateStr).format("YYYY-MM-DD");
-					if (closedDates.includes(dateStr)) {
-						alert("この日は休館日のため予約できません。");
-						return;
-					}
-					// TODO: 有効日のクリック処理を書く（必要に応じて）
 				},
 				// 見た目をグレーアウト
 				dayCellClassNames: function(arg) {

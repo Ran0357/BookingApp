@@ -43,7 +43,10 @@ public class UseprofileController {
 
         return "redirect:/userprofile";
     }
-
+    @GetMapping("/school/notifications")
+    public String showNotifications() {
+        return "notifications";  // templates/notifications.html を返すだけ
+    }
     
 
 }

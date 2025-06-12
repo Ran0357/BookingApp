@@ -48,4 +48,15 @@ public interface FacilityAvailabilityMapper {
      * @return 空き状況リスト
      */
     List<FacilityAvailability> findFacilityAvailabilityForTimeRange(int facilityTypeId, LocalDate date, LocalTime startTime, LocalTime endTime);
+    
+	/**
+	 * 空き状況の復元処理
+	 * @param facilityTypeId サイトタイプID
+	 * @param date 取得日
+	 * @param startTime 取得開始時間
+	 * @param endTime 取得終了時間
+	 * @return 更新件数
+	 */
+    int restoreAvailabilityCount(Integer facilityTypeId, LocalDate date, LocalTime startTime, LocalTime endTime);
+
 }

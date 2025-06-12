@@ -1,8 +1,6 @@
 package com.example.demo.presentation.api;
 
-import java.time.LocalDate;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,9 +15,11 @@ public class ResultFacilityAvailability {
 	/** タイトル */
 	private String title;
 	
-	/** チェックイン日 */
-	@JsonSerialize
-	private LocalDate start;
+	/** 予約日+ 予約開始時間 */
+	private LocalDateTime start;
+	
+	/** 予約日+ 予約終了時間 */
+	private LocalDateTime end;
 	
 	/** URL */
 	private String url;

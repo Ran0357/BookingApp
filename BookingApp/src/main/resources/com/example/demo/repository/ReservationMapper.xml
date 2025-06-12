@@ -33,13 +33,16 @@
 		r.number_of_people,
 		r.canceled_at,
 		r.created_at,
-		st.id as facility_type_id,
+		st.id as
+		facility_type_id,
 		st.name as facility_type_name,
-		st.capacity as facility_type_capacity
+		st.capacity as
+		facility_type_capacity
 		from
 		reservations r
 		inner join
-		facility_types st on r.facility_id = st.id
+		facility_types st on
+		r.facility_id = st.id
 		where
 		r.member_id = #{memberId}
 		order by
@@ -63,19 +66,23 @@
 		r.member_id,
 		r.canceled_at,
 		r.created_at,
-		st.id as facility_type_id,
+		st.id as
+		facility_type_id,
 		st.name as facility_type_name,
-		st.capacity as facility_type_capacity,
+		st.capacity as
+		facility_type_capacity,
 		m.id as member_id,
 		m.name as member_name,
-		m.mail as member_mail,
+		m.mail
+		as member_mail,
 		m.phone_number as member_phone_number
 		from
 		reservations r
 		inner join
 		facility_types st on r.facility_id = st.id
 		inner join
-		members m on r.member_id = m.id
+		members
+		m on r.member_id = m.id
 		where
 		r.id = #{reservationId}
 	</select>
@@ -84,16 +91,21 @@
 	<update id="cancelReservation">
 		update reservations
 		set canceled_at = now()
-		where id = #{reservationId}
+		where id =
+		#{reservationId}
 	</update>
+
 
 	<!-- 予約取得(施設タイプID、予約日) -->
 	<select id="findByDateAndFacilityType" parameterType="map"
 		resultType="com.example.demo.domain.model.Reservations">
 		select *
 		from reservations
-		where reservation_date = #{reservationDate}
+		where reservation_date =
+		#{reservationDate}
 		and facility_id = #{facilityTypeId}
+		and canceled_at
+		is null
 	</select>
 
 	<!-- 予約数取得 -->
@@ -101,7 +113,8 @@
 		resultType="int">
 		SELECT COUNT(*)
 		FROM reservations
-		WHERE member_id = #{memberId}
+		WHERE member_id =
+		#{memberId}
 	</select>
 
 
