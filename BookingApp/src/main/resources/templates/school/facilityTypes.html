@@ -38,9 +38,6 @@
 
             <div class="card-body siteType-card-body">
               <h5 class="card-title" th:text="${facilityType.name}"></h5>
-              <p class="card-text">
-                <small th:text="|ご利用人数： ${facilityType.capacity}名まで|"></small>
-              </p>
               <a th:href="@{/school/schedule(facilityTypeId=${facilityType.id})}" class="btn btn-primary btn-block" role="button" style="max-width: 400px;">
                 選択
               </a>
