@@ -126,7 +126,7 @@ public class SchoolController {
 		}
 
 		// メッセージセット（使用中になったかどうかで文言変える）
-		String msg = newStatus ? "使用中になりました。" : "お疲れさまでした。";
+		String msg = newStatus ? "使用中になりました。\n利用終了時にもう一度QRコードを読み込んでください。" : "お疲れさまでした。";
 		model.addAttribute("message", msg);
 		model.addAttribute("equipmentName", equipment.getEquipmentName());
 

@@ -119,6 +119,25 @@ div.fc-sticky {
   color: #000 !important; /* 文字色を黒に */
   font-weight: bold;
 }
+.fc-very-available-date {
+  background-color: transparent !important; /* 通常時は透明 */
+}
+
+.fc-very-available-date:hover {
+  background-color: #d4f7d4 !important; /* ホバー時だけ緑 */
+  cursor: pointer;
+  opacity: 1;
+}
+.fc-unavailable-date {
+  background-color: #f2f2f2 !important; /* 薄いグレー */
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+
+
+
+
 
 /* 選択中のイベント（✔️）用のスタイル */
 .selected-slot-display {
