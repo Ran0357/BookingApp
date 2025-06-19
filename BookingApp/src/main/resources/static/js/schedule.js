@@ -37,7 +37,21 @@ document.addEventListener("DOMContentLoaded", function() {
 					center: "title",
 					right: "prev,next"
 				},
-				dayCellContent: function(e) {
+		eventDidMount: function(info) {
+    const dateStr = dayjs(info.event.start).format("YYYY-MM-DD");
+    const dayCell = document.querySelector(`[data-date="${dateStr}"]`);
+    if (info.event.title === "◎") {
+        if (dayCell) {
+            dayCell.classList.add("fc-very-available-date");
+        }
+    } else if (info.event.title === "×") {
+        if (dayCell) {
+            dayCell.classList.add("fc-unavailable-date");
+        }
+    }
+},
+
+		dayCellContent: function(e) {
 					e.dayNumberText = e.dayNumberText.replace("日", "");
 				},
 				validRange: {
@@ -83,6 +97,7 @@ document.addEventListener("DOMContentLoaded", function() {
 							failureCallback();
 						});
 				},
+
 
 				// 休館日を選択不可にする
 				selectAllow: function(info) {

@@ -4,17 +4,19 @@
   <meta charset="UTF-8" />
   <title>利用状況切り替え結果</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      text-align: center;
-    }
-    .message {
-      font-size: 1.5em;
-      margin-top: 40px;
-      color: #333;
-    }
-  </style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    text-align: center;
+  }
+  .message {
+    font-size: 1.5em;
+    margin-top: 40px;
+    color: #333;
+    white-space: pre-line; /* ← この1行を追加！ */
+  }
+</style>
+
 </head>
 <body>
   <h2 th:text="'機器：' + ${equipmentName}"></h2>
