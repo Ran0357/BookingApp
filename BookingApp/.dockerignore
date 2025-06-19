@@ -21,3 +21,7 @@ target/
 # キャッシュや一時フォルダ（必要なら追加）
 .cache/
 tmp/
+
+**/bin
+**/.local
+**/cachemounts
