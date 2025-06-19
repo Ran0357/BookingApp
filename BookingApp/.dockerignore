@@ -1,0 +1,23 @@
+# ビルド成果物
+target/
+
+# Git管理ファイル（Dockerイメージに含めたくない）
+.git/
+
+# IDE関連ファイル
+.idea/
+.vscode/
+
+# ログファイル
+*.log
+
+# Maven Wrapper関係（必要なものは除外しない）
+!/.mvn/wrapper/maven-wrapper.jar
+
+# OSごとの一時ファイル等
+*.swp
+*.DS_Store
+
+# キャッシュや一時フォルダ（必要なら追加）
+.cache/
+tmp/
