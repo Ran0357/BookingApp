@@ -1,0 +1,179 @@
+-- ▼ セッション設定（PostgreSQL では無視またはSETを別途使用）
+-- SET statement_timeout = '300s';
+-- SET max_recursive_iterations = 5000;
+
+-- ▼ roles テーブル
+CREATE TABLE IF NOT EXISTS roles (
+    key VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO roles (key, name, created_at) VALUES 
+('ROLE_ADMIN', '管理者', CURRENT_TIMESTAMP),
+('ROLE_GENERAL', '一般ユーザ', CURRENT_TIMESTAMP);
+
+-- ▼ members テーブル
+CREATE TABLE IF NOT EXISTS members (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    mail VARCHAR(255) UNIQUE,
+    password TEXT NOT NULL,
+    phone_number VARCHAR(15),
+    role VARCHAR(255),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (role) REFERENCES roles(key)
+);
+
+-- ▼ facility_types テーブル
+CREATE TABLE IF NOT EXISTS facility_types (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    capacity INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO facility_types (id, name, capacity, created_at) VALUES
+(1, 'カラオケ', 20, CURRENT_TIMESTAMP),
+(2, 'ジム', 8, CURRENT_TIMESTAMP),
+(3, 'ブース', 34, CURRENT_TIMESTAMP);
+
+-- ▼ calendar テーブル
+CREATE TABLE IF NOT EXISTS calendar (
+    calendar_date DATE PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO calendar (calendar_date, created_at)
+SELECT calendar_date, CURRENT_TIMESTAMP FROM (
+    WITH RECURSIVE date_series AS (
+    SELECT DATE '2025-05-01' AS calendar_date
+    UNION ALL
+    SELECT (calendar_date + INTERVAL '1 day')::date
+    FROM date_series
+    WHERE calendar_date < DATE '2030-12-31'
+)
+    SELECT calendar_date FROM date_series
+) AS ds;
+
+-- ▼ facility_availability テーブル
+CREATE TABLE IF NOT EXISTS facility_availability (
+    calendar_date DATE,
+    facility_type_id INT,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    availability_count SMALLINT NOT NULL,
+    max_count SMALLINT NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (calendar_date, facility_type_id, start_time),
+    FOREIGN KEY (calendar_date) REFERENCES calendar(calendar_date),
+    FOREIGN KEY (facility_type_id) REFERENCES facility_types(id)
+);
+
+-- ▼ facilities テーブル
+CREATE TABLE IF NOT EXISTS facilities (
+    id SERIAL PRIMARY KEY,
+    facility_type_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (facility_type_id) REFERENCES facility_types(id)
+);
+
+INSERT INTO facilities (facility_type_id, name, description) VALUES
+(1, 'カラオケ', 'カラオケルーム'),
+(2, 'ジム1', 'エアロバイク1'),
+(2, 'ジム2', 'エアロバイク2'),
+(2, 'ジム3', 'エアロバイク3'),
+(2, 'ジム4', 'ランニングマシン1'),
+(2, 'ジム5', 'ランニングマシン2'),
+(2, 'ジム6', 'ランニングマシン3'),
+(2, 'ジム7', 'ランニングマシン4'),
+(2, 'ジム8', 'ランニングマシン5'),
+(3, 'ブース1', '6号館2階'),
+(3, 'ブース2', '6号館3階');
+
+-- ▼ reservations テーブル
+CREATE TABLE IF NOT EXISTS reservations (
+    id SERIAL PRIMARY KEY,
+    facility_id INT NOT NULL,
+    reservation_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    number_of_people INT NOT NULL,
+    member_id INT,
+    canceled_at TIMESTAMP DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (facility_id) REFERENCES facilities(id),
+    FOREIGN KEY (member_id) REFERENCES members(id)
+);
+
+-- ▼ facility_availability データ挿入
+INSERT INTO facility_availability (
+    calendar_date, facility_type_id, start_time, end_time,
+    availability_count, max_count, updated_at, created_at
+)
+WITH RECURSIVE
+date_series AS (
+    SELECT DATE '2025-05-01' AS calendar_date
+    UNION ALL
+    SELECT (calendar_date + INTERVAL '1 day')::date
+    FROM date_series
+    WHERE calendar_date < DATE '2030-12-31'
+),
+minute_series AS (
+    SELECT 0 AS minutes
+    UNION ALL
+    SELECT minutes + 15 FROM minute_series
+    WHERE minutes + 15 < 1440
+),
+facility_config AS (
+    SELECT id AS facility_type_id,
+           CASE id
+               WHEN 1 THEN TIME '15:30:00'
+               ELSE TIME '09:00:00'
+           END AS open_time,
+           TIME '17:30:00' AS close_time,
+           CASE id
+               WHEN 1 THEN 1
+               WHEN 2 THEN 8
+               WHEN 3 THEN 1
+               ELSE 1
+           END AS availability_count
+    FROM facility_types
+    WHERE id != 2
+),
+time_slots AS (
+    SELECT 
+        f.facility_type_id,
+        CASE 
+            WHEN f.facility_type_id = 1 THEN TIME '15:30:00'
+            ELSE (f.open_time + (m.minutes || ' minutes')::interval)::time
+        END AS start_time,
+        CASE 
+            WHEN f.facility_type_id = 1 THEN TIME '17:30:00'
+            ELSE (f.open_time + ((m.minutes + 15) || ' minutes')::interval)::time
+        END AS end_time,
+        f.availability_count,
+        f.availability_count AS max_count,
+        CURRENT_TIMESTAMP AS updated_at,
+        CURRENT_TIMESTAMP AS created_at
+    FROM facility_config f
+    LEFT JOIN minute_series m 
+        ON f.facility_type_id != 1
+           AND (f.open_time + ((m.minutes + 15) || ' minutes')::interval) <= f.close_time
+)
+SELECT
+    d.calendar_date,
+    t.facility_type_id,
+    t.start_time,
+    t.end_time,
+    t.availability_count,
+    t.max_count,
+    t.updated_at,
+    t.created_at
+FROM date_series d
+JOIN time_slots t ON TRUE;
