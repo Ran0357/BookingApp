@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +22,12 @@ public class SecurityConfig {
     }
     
     @Bean
+    AuthenticationEntryPoint authenticationEntryPoint() {
+        // ログインページのURLにパラメータを付ける
+        return new LoginUrlAuthenticationEntryPoint("/login?loginRequired");
+    }
+    
+    @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         
         http
@@ -30,8 +38,8 @@ public class SecurityConfig {
                     .requestMatchers("/","/login", "/logout").permitAll()
                     .requestMatchers("/signup/**").permitAll()
                     .requestMatchers("/school/member/**").authenticated()
-                    .requestMatchers("/school/**").permitAll()
-                    .requestMatchers("/api/**").permitAll()
+                    .requestMatchers("/school/**").authenticated()
+                    .requestMatchers("/api/**").authenticated()
                     // 認証の必要があるように設定
                     .anyRequest().authenticated())
             .formLogin(login -> login
@@ -40,6 +48,9 @@ public class SecurityConfig {
                     .usernameParameter("mail")
                     .passwordParameter("password")
                     .defaultSuccessUrl("/", true)) // 初回ログイン後もリダイレクトしない
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint(authenticationEntryPoint())
+                    )
             .logout(logout -> logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/login?logout")
