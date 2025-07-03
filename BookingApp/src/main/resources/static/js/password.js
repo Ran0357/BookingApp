@@ -19,5 +19,5 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   passwordInput.addEventListener("input", validatePasswords);
-  confirmInput.addEventListener("input", validatePasswords);
+ 
 });

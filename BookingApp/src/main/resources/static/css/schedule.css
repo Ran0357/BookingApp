@@ -135,10 +135,6 @@ div.fc-sticky {
 }
 
 
-
-
-
-
 /* 選択中のイベント（✔️）用のスタイル */
 .selected-slot-display {
   background-color: #90ee90 !important; /* Light green */

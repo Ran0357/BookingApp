@@ -52,14 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  document.getElementById("confirmBooking").addEventListener("click", () => {
-    if (selectedSlots.length === 0) return;
-    const summary = selectedSlots.map(s => `${dayjs(s.start).format("MM/DD HH:mm")} - ${dayjs(s.end).format("HH:mm")}`).join("\n");
-    if (confirm(`以下の時間帯を予約しますか？\n\n${summary}`)) {
-      console.log("予約確定:", selectedSlots);
-      // API送信処理
-    }
-  });
+
 
   let calendar;
 

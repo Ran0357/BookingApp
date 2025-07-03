@@ -3,6 +3,8 @@ package com.example.demo.presentation.school;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.modelmapper.ModelMapper;
@@ -154,6 +156,29 @@ public class SchoolController {
 			facilityUseForm.setStartDateTime(useDate.atTime(15, 30));
 			facilityUseForm.setEndDateTime(useDate.atTime(17, 30));
 		}
+		
+		List<LocalTime> timeOptions = new ArrayList<>();
+		LocalTime now = LocalTime.now();
+		LocalTime baseTime = LocalTime.of(9, 0);
+		LocalTime endTimeLimit = LocalTime.of(17, 15);
+
+		// 今日であれば「今より後」の時間に限定する（15分単位に切り上げ）
+		LocalDate today = LocalDate.now();
+		boolean isToday = useDate.equals(today);
+
+		// 現在時刻を15分単位に切り上げ
+		if (isToday && now.isAfter(baseTime)) {
+		    int minutes = ((now.getMinute() + 14) / 15) * 15;
+		    baseTime = now.withMinute(0).withSecond(0).withNano(0).plusMinutes(minutes);
+		}
+
+		LocalTime time = baseTime;
+		while (!time.isAfter(endTimeLimit)) {
+		    timeOptions.add(time);
+		    time = time.plusMinutes(15);
+		}
+		model.addAttribute("timeOptions", timeOptions);
+
 
 		return "school/facilityInfo";
 	}

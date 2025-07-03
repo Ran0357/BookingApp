@@ -33,13 +33,15 @@ public class FacilityUseFormValidator implements Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 		FacilityUseForm facilityUseForm = (FacilityUseForm) target;
-		System.out.println("startTime: " + facilityUseForm.getStartTimeOnly());
-		System.out.println("endTime: " + facilityUseForm.getEndTimeOnly());
+
+		// --- 開始時間と終了時間の整合性チェック ---
+		if (facilityUseForm.getStartTimeOnly() != null && facilityUseForm.getEndTimeOnly() != null) {
+			if (!facilityUseForm.getStartTimeOnly().isBefore(facilityUseForm.getEndTimeOnly())) {
+				errors.rejectValue("startTimeOnly", "validation.custom.invalidTimeRange", "開始時間は終了時間より前にしてください。");
+			}
+		}
 
 		FacilityReservationInfo reservationInfo = FacilityReservationInfo.from(facilityUseForm);
-		System.out.println("FacilityUseForm.facilityId: " + facilityUseForm.getFacilityId());
-
-		System.out.println("facilityId: " + reservationInfo.getFacilityId());
 
 		// 上限人数取得（facilityId）
 		int capacity = facilityTypeService.findByFacilityTypeId(reservationInfo.getFacilityId())
@@ -56,8 +58,6 @@ public class FacilityUseFormValidator implements Validator {
 		validateFacilityAvailability(errors, reservationInfo);
 	}
 
-
-
 	/**
 	 * 利用人数検証
 	 * 利用人数がサイトの上限を上回る場合エラー
@@ -65,14 +65,13 @@ public class FacilityUseFormValidator implements Validator {
 	 * @param facilityUseForm
 	 * @param capacity サイトの上限人数
 	 */
-	private void validateNumberOfPeople(Errors errors,FacilityReservationInfo facilityUseInfo , int capacity) {
-		
+	private void validateNumberOfPeople(Errors errors, FacilityReservationInfo facilityUseInfo, int capacity) {
+
 		if (!facilityUseInfo.isValidNumberOfPeople(capacity)) {
 			errors.rejectValue("numberOfPeople", "validation.custom.numberOfPeopleIncorrect");
 		}
 	}
-	
-	
+
 	/**
 	 * サイトの空き状況検証
 	 * チェックイン日からチェックアウト日までの期間で、満室の日程がある場合はエラー
@@ -82,8 +81,7 @@ public class FacilityUseFormValidator implements Validator {
 	 */
 	private void validateFacilityAvailability(Errors errors, FacilityReservationInfo info) {
 		FacilityType facilityType = facilityTypeService.findByFacilityTypeId(info.getFacilityId())
-			.orElseThrow(() -> new SystemException("施設情報が見つかりません"));
-		
+				.orElseThrow(() -> new SystemException("施設情報が見つかりません"));
 
 		int facilityTypeId = facilityType.getId(); // 施設タイプIDで分岐
 
@@ -92,15 +90,14 @@ public class FacilityUseFormValidator implements Validator {
 		if (facilityTypeId == 1) {
 			// カラオケ（日単位）
 			available = facilityAvailabilityService.isAvailableOnDate(
-				info.getFacilityId(), info.getUseDate());
+					info.getFacilityId(), info.getUseDate());
 		} else {
 			// ジム・ブース（時間単位）
 			available = facilityAvailabilityService.isAvailableForTimeRange(
-				    info.getFacilityId(), info.getUseDate(), info.getStartTime(), info.getEndTime());
+					info.getFacilityId(), info.getUseDate(), info.getStartTime(), info.getEndTime());
 
 		}
 
-		
 		if (!available) {
 			errors.rejectValue("useDate", "validation.custom.facilityAvailabilityIncorrect");
 		}

@@ -14,6 +14,10 @@
     <div class="alert alert-success" th:if="${param.logout}">
       <small>ログアウトしました</small>
     </div>
+    <!-- ログイン必須 -->
+  <div class="alert alert-warning" th:if="${param.loginRequired}">
+    <small>ログインしないと使用できません！</small>
+  </div>
   </div>
 </body>
 
