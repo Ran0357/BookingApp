@@ -53,28 +53,31 @@
 						</div>
 					</div>
 
-					<!-- facilityId != 1 (ブースやジム) -->
+					<!-- facilityId != 1 の場合 -->
 					<div th:if="${facilityUseForm.facilityId != 1}">
+						<!-- 利用時間 -->
 						<div class="form-group row">
-							<label for="startTimeOnly" class="col-md-3 col-form-label">開始時間</label>
+							<label class="col-md-3 col-form-label">開始時間</label>
 							<div class="col-md-5">
-								<select th:field="*{startTimeOnly}" class="form-control">
-									<option value="" disabled selected>--選択してください--</option>
-									<option th:each="t : ${timeOptions}" th:value="${t}"
-										th:text="${#temporals.format(t, 'HH:mm')}"></option>
-								</select>
+								<input type="time" id="startTimeOnly" class="form-control" readonly>
+								<input type="hidden" id="startTimeOnlyHidden" name="startTimeOnly">
 							</div>
 						</div>
 						<div class="form-group row">
-							<label for="endTimeOnly" class="col-md-3 col-form-label">終了時間</label>
+							<label class="col-md-3 col-form-label">終了時間</label>
 							<div class="col-md-5">
-								<select th:field="*{endTimeOnly}" class="form-control">
-									<option th:each="time : ${timeOptions}" th:value="${time}"
-										th:text="${#temporals.format(time, 'HH:mm')}"></option>
-								</select>
+								<input type="time" id="endTimeOnly" class="form-control" readonly>
+								<input type="hidden" id="endTimeOnlyHidden" name="endTimeOnly">
 							</div>
 						</div>
+
+
+						<!-- hidden -->
+						<input type="hidden" id="facilityId" name="facilityId" th:value="${facilityUseForm.facilityId}">
+
 					</div>
+
+
 
 					<!-- 利用人数 -->
 					<div class="form-group row">
@@ -104,6 +107,8 @@
 					<!-- hidden -->
 					<input type="hidden" th:field="*{facilityId}" id="facilityId">
 					<input type="hidden" th:field="*{facilityName}">
+
+
 				</form>
 			</div>
 		</div>

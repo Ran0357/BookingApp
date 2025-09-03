@@ -150,12 +150,20 @@ public class SchoolController {
 		facilityUseForm.setFacilityName(schoolAppService.findFacilityTypeName(facilityTypeId));
 
 		if (startDateTime != null && endDateTime != null) {
-			facilityUseForm.setStartDateTime(startDateTime);
-			facilityUseForm.setEndDateTime(endDateTime);
+		    facilityUseForm.setStartDateTime(startDateTime);
+		    facilityUseForm.setEndDateTime(endDateTime);
+
+		    // LocalTime フィールドにもセットする
+		    facilityUseForm.setStartTimeOnly(startDateTime.toLocalTime());
+		    facilityUseForm.setEndTimeOnly(endDateTime.toLocalTime());
 		} else if (facilityTypeId == 1) { // カラオケはデフォルト時間セット
-			facilityUseForm.setStartDateTime(useDate.atTime(15, 30));
-			facilityUseForm.setEndDateTime(useDate.atTime(17, 30));
+		    facilityUseForm.setStartDateTime(useDate.atTime(15, 30));
+		    facilityUseForm.setEndDateTime(useDate.atTime(17, 30));
+
+		    facilityUseForm.setStartTimeOnly(LocalTime.of(15, 30));
+		    facilityUseForm.setEndTimeOnly(LocalTime.of(17, 30));
 		}
+
 		
 		List<LocalTime> timeOptions = new ArrayList<>();
 		LocalTime now = LocalTime.now();
@@ -190,7 +198,7 @@ public class SchoolController {
 	public String sendToReserve(@ModelAttribute FacilityUseForm facilityUseForm, BindingResult result) {
 		LocalDate useDate = facilityUseForm.getUseDate(); // 利用日を取得
 		LocalTime startTime = facilityUseForm.getStartTimeOnly(); // 開始時間を取得
-		LocalTime endTime = facilityUseForm.getEndTimeOnly();;
+		LocalTime endTime = facilityUseForm.getEndTimeOnly();
 
 		if (facilityUseForm.getFacilityId() == 1) {
 	        facilityUseForm.setStartDateTime(useDate.atTime(15, 30));
@@ -200,6 +208,7 @@ public class SchoolController {
 	        if (startTime != null && endTime!= null) {
 	            facilityUseForm.setStartDateTime(useDate.atTime(startTime));
 	            facilityUseForm.setEndDateTime(useDate.atTime(endTime));
+	            
 	        }
 	    }
 

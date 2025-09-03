@@ -1,78 +1,61 @@
 'use strict';
 
-/**
- * スケジュールに戻る
- */
-function backward() {
-	const facilityTypeId = document.getElementById("facilityTypeId").value;
-	location.href = `/school/schedule?facilityTypeId=${facilityTypeId}`;
-}
-
-/**
- * 利用人数を施設ごとに変更する処理
- */
 document.addEventListener("DOMContentLoaded", function() {
-	const facilityIdElem = document.getElementById("facilityId");
-	const select = document.getElementById("numberOfPeople");
+    const facilityIdElem = document.getElementById("facilityId");
+    const numberSelect = document.getElementById("numberOfPeople");
 
-	if (!facilityIdElem || !select) return;
-	console.log("facilityIdElem.value:", facilityIdElem.value);
+    if (!facilityIdElem || !numberSelect) return;
 
-	const facilityId = parseInt(facilityIdElem.value);
+    const facilityId = parseInt(facilityIdElem.value);
 
-	const optionsMap = {
-		1: Array.from({ length: 16 }, (_, i) => i + 5), // カラオケ（5〜20人）
-		3: [1],                                         // ブース
-		// 他の施設IDがあれば追加
-	};
+    // 利用人数オプション
+    const optionsMap = {
+        1: Array.from({ length: 36 }, (_, i) => i + 5), // カラオケ 5~40人
+        3: [1] // ブース
+    };
+    const options = optionsMap[facilityId] || [1];
 
-	const options = optionsMap[facilityId] || [1]; // それ以外は1人
+    numberSelect.innerHTML = "";
+    options.forEach(num => {
+        const opt = document.createElement("option");
+        opt.value = num;
+        opt.textContent = num;
+        numberSelect.appendChild(opt);
+    });
 
-	// 初期化
-	select.innerHTML = "";
+    // 開始・終了時間 input
+    const startInput = document.getElementById("startTimeOnly");
+    const endInput = document.getElementById("endTimeOnly");
+    const startHidden = document.getElementById("startTimeOnlyHidden");
+    const endHidden = document.getElementById("endTimeOnlyHidden");
 
-	// オプションを追加
-	options.forEach(num => {
-		const option = document.createElement("option");
-		option.value = num;
-		option.textContent = num;
-		select.appendChild(option);
-	});
-	const startSelect = document.getElementById("startTimeOnly");
-	const endSelect = document.getElementById("endTimeOnly");
+    // GETパラメータから初期値を取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const startParam = urlParams.get("startDateTime");
+    const endParam = urlParams.get("endDateTime");
 
-	if (!startSelect || !endSelect) return;
+    if (startParam && endParam) {
+        const start = new Date(startParam);
+        const end = new Date(endParam);
+        startInput.value = start.toTimeString().slice(0,5);
+        endInput.value = end.toTimeString().slice(0,5);
+        startHidden.value = startInput.value;
+        endHidden.value = endInput.value;
+    } else if (facilityId === 1) {
+        // デフォルト時間
+        startInput.value = "15:30";
+        endInput.value = "17:30";
+        startHidden.value = "15:30";
+        endHidden.value = "17:30";
+    }
 
-	// 元の終了時間の全選択肢を保存しておく
-	const originalEndOptions = Array.from(endSelect.options).map(option => ({
-		value: option.value,
-		text: option.text,
-	}));
-
-	function updateEndTimeOptions() {
-		const startValue = startSelect.value;
-
-		// 終了時間の選択肢をいったんクリア
-		endSelect.innerHTML = "";
-
-		// 開始時間より後の時間だけ追加
-		originalEndOptions.forEach(opt => {
-			if (!startValue || opt.value > startValue) {
-				const option = document.createElement("option");
-				option.value = opt.value;
-				option.textContent = opt.text;
-				endSelect.appendChild(option);
-			}
-		});
-
-		// 終了時間の選択値が無くなっていたら空にする
-		if (!Array.from(endSelect.options).some(opt => opt.value === endSelect.value)) {
-			endSelect.value = "";
-		}
-	}
-
-	updateEndTimeOptions();
-
-	startSelect.addEventListener("change", updateEndTimeOptions);
+    // 「予約に進む」ボタンで hidden に値をセットして送信
+    const confirmBtn = document.getElementById("confirmBtn");
+    if (confirmBtn) {
+        confirmBtn.addEventListener("click", function() {
+            startHidden.value = startInput.value;
+            endHidden.value = endInput.value;
+            startHidden.form.submit();
+        });
+    }
 });
-
